@@ -42,9 +42,9 @@ k5 = 1;
 
 % parameters for cell population dynamics
 
-a0 = 10;
+a0 = 5;
 oc = 0.8;
-pow = -0.2;
+pow = -1;
 v0 = 1;
 
 
