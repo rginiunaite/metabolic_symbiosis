@@ -25,7 +25,7 @@ options=odeset('RelTol',1e-6);
 % first 4 components fixed, this is maximum, so that one could find consistent initial
 % conditions for both derivative
 
-T = 100000;           % Sets the end of time interval
+T = 50000;           % Sets the end of time interval
 tspan = [0 T];
 y0 = IC;           % Sets initial condition
 options=odeset('RelTol',1e-4);
@@ -43,49 +43,53 @@ figure
 
 % Population
 subplot(2,3,[1 3]);
-plot(t,y(:,3)); % first population
+plot(t,y(:,3),'LineWidth', 2);set(gca,'FontSize',14); % first population
 hold on
-plot(t,y(:,4)); % second population
-plot(t,y(:,3) + y(:,4)); % total population
-legend('1st component','2nd component','Total')
-xlabel('time')
-ylabel('Population')
-title('Populations ')
+plot(t,y(:,4),'LineWidth', 2);set(gca,'FontSize',14); % second population
+plot(t,y(:,3) + y(:,4),'LineWidth', 2);set(gca,'FontSize',14); % total population
+h_legend = legend('1st component','2nd component','Total');
+set(h_legend,'FontSize',14)
+xlabel('time','FontSize',14)
+ylabel('Population','FontSize',14)
+title('Populations ','FontSize',14)
 
 
 % comparison of lactates
 subplot(2,3,4);
-plot(t,y(:,1));
+plot(t,y(:,1),'LineWidth', 2);set(gca,'FontSize',14)
 hold on
-plot(t,y(:,2));
+plot(t,y(:,2),'LineWidth', 2);set(gca,'FontSize',14)
 %plot(t,y(:,1) + y(:,2)); % total population
-legend('1st component','2nd component')
-xlabel('time')
-ylabel('Lactate')
-title('Lactate')
+h_legend = legend('1st component','2nd component');
+set(h_legend,'FontSize',14)
+xlabel('time','FontSize',14)
+ylabel('Lactate','FontSize',14)
+title('Lactate','FontSize',14)
 
 
 % comparison of MCT4
 subplot(2,3,5);
-plot(t,y(:,7));
+plot(t,y(:,7),'LineWidth', 2);set(gca,'FontSize',14)
 hold on
-plot(t,y(:,8));
+plot(t,y(:,8),'LineWidth', 2);set(gca,'FontSize',14)
 %plot(t,y(:,7) + y(:,8)); % total population
-legend('1st component','2nd component')
-xlabel('time')
-ylabel('MCT4')
-title('MCT4')
+h_legend = legend('1st component','2nd component');
+set(h_legend,'FontSize',14)
+xlabel('time','FontSize',14)
+ylabel('MCT4','FontSize',14)
+title('MCT4','FontSize',14)
 
 % comparison of Oxygen
 subplot(2,3,6);
-plot(t,y(:,5));
+plot(t,y(:,5),'LineWidth', 2);set(gca,'FontSize',14)
 hold on
-plot(t,y(:,6));
+plot(t,y(:,6),'LineWidth', 2);set(gca,'FontSize',14)
 %plot(t,y(:,5) + y(:,7)); % total population
-legend('1st component','2nd component')
-xlabel('time')
-ylabel('Oxygen')
-title('Oxygen')
+h_legend = legend('1st component','2nd component');
+set(h_legend,'FontSize',14)
+xlabel('time','FontSize',14)
+ylabel('Oxygen','FontSize',14)
+title('Oxygen','FontSize',14)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -120,14 +124,14 @@ function deriv = dynamics(t,y,yp,InitialPop)
     KMAX4=0.1; % parameter for lactate dynamics, dependence on MCT4
 
     S1=1*InitialPop; % source of oxygen depends on how much population I have initially 
-    %S2 = 0; % no source in hypoxic component
-    if t<50000
-        S2=1*InitialPop;    % in the hypoxic compartment source is the same
-        %up to a certain time
-    else
-        %S2=0;
-        S2=1*InitialPop;
-    end
+    S2 = 0; % no source in hypoxic component
+%     if t<50000
+%         S2=1*InitialPop;    % in the hypoxic compartment source is the same
+%         %up to a certain time
+%     else
+%         %S2=0;
+%         S2=1*InitialPop;
+%     end
 
     beta1 = 2.5; %parameter for the hypoxia dependent on HIF-1alpha
     
