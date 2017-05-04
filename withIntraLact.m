@@ -135,26 +135,26 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
     %as a function of h_i
 
     KMAX1=0.1; % parameter for lactate dynamics, dependence on MCT1
-    KMAX4=0.4; % parameter for lactate dynamics, dependence on MCT4
+    KMAX4=0.1; % parameter for lactate dynamics, dependence on MCT4
 
     S1=1*InitialPop; % source of oxygen depends on how much population I have initially 
-    S2 = 0; % when anitangiogenesis treatment is applied, no oxygen source to the second component
-    if t<50000
-        S2=1*InitialPop;    % in the hypoxic compartment source is the same
-        %up to a certain time
-    else
-        S2=0;
-        S2=1*InitialPop;
-    end
+   S2 = 0; % when anitangiogenesis treatment is applied, no oxygen source to the second component
+%     if t<50000
+%         S2=1*InitialPop;    % in the hypoxic compartment source is the same
+%         %up to a certain time
+%     else
+%         S2=0;
+%         S2=1*InitialPop;
+%     end
     
 
     % when anti-angiogenesis treatment is applied MCT1 and MCT4
     % upregulation changes
     if S2 == 0 
-       MCT11 = 0.15;
+       MCT11 = 0.1;
        MCT12 = 0.1;
        MCT41 = 0.1;
-       MCT42 = 0.15;
+       MCT42 = 0.25;
   
     end
     
