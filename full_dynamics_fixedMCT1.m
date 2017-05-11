@@ -1,15 +1,8 @@
 clear all
 % Implicit ODE solver
-% fixed MCT4 and MCT1 and they are turned on only when S2 = 0 
+% Including intracellular lactate to reflect the effect of MCT correctly
+% MCT4 dynamics, MCT1 fixed
 
-
-
-% fixed MCT4
-MCT41 = 0.1;
-MCT42 = 0.1;
-
-MCT11 = 1;
-MCT12 = 1;
 
 
 IC(1) = 0;        % Initial extracellular lactate, 1st compartment
@@ -18,26 +11,28 @@ IC(3) = 1000;     % Initial population 1st compartment
 IC(4) = 1000;        % Initial population 2nd compartment
 IC(5) = 0.7;      % Initial oxygen 1st compartment    
 IC(6) = 0.3;      % Initial oxygen 2nd compartment  
-%IC(5) = 0.1;      % Initial MCT4 1st comparmtent
-%IC(6) = 0.1;      % Initial MCT4 2nd compartment
-%IC(9)=0;
-%IC(10)=0;
+IC(7) = 0.1;     % Initial MCT4 1st comparmtent
+IC(8) = 0.1;     % Initial MCT4 2nd compartment
+% IC(9) = 0.1;     % Initial MCT1 1st comparmtent
+% IC(10) = 0.1;     % Initial MCT1 2nd compartment
+IC(9)=0;          % Intracellular lactate, 1st
+IC(10)=0;          % Intracellular lactate, 2nd
 
 InitialPop = IC(3) ; % have variable for initial population in the first compartment
 
 t0 = 0;
-yp0 = [0 0 0 0 0 0]; % guess for initial values of derivatives
+yp0 = [0 0 0 0 0 0 0 0 0 0]; % guess for initial values of derivatives
 options=odeset('RelTol',1e-6);
-[y0,yp0] = decic(@dynamics,t0,IC,[1 1 1 1 1 1],yp0,[0 0 0 0 0 0],options,InitialPop,MCT41,MCT42,MCT11,MCT12);
+[y0,yp0] = decic(@dynamics,t0,IC,[1 1 1 1 1 1 1 1 1 1],yp0,[0 0 0 0 0 0 0 0 0 0],options,InitialPop);
 % 1 corresponds to fixed components, 0 to variable, they are determined
 % using this function
 
-T = 1e7;           % Sets the end of time interval
+T = 1e6;           % Sets the end of time interval
 tspan = [0 T];
 y0 = IC;           % Sets initial condition
 options=odeset('RelTol',1e-4);
 
-[t,y]=ode15i(@dynamics,tspan,y0,yp0,options,InitialPop,MCT41,MCT42,MCT11,MCT12);
+[t,y]=ode15i(@dynamics,tspan,y0,yp0,options,InitialPop);
 
 len = length(y(:,3)); % number of simulations done
 
@@ -49,12 +44,12 @@ final_total = y(len,3) + y(len,4);
 figure
 
 % Population
-subplot(3,1,1);
+subplot(4,2,[1 2]);
 plot(t,y(:,3),'LineWidth', 2); % first population
 hold on
 plot(t,y(:,4),'LineWidth', 2); % second population
 plot(t,y(:,3) + y(:,4),'LineWidth', 2); % total population
-h_legend = legend('1st component','2nd component','Total')
+h_legend = legend('1st component','2nd component','Total');
 set(h_legend,'FontSize',14)
 xlabel('Time','FontSize',14)
 ylabel('Population','FontSize',14)
@@ -62,8 +57,8 @@ title(['Populations, final total ' num2str(final_total) ', final 1st component '
 
 
 
-% comparison of lactates
-subplot(3,1,2);
+% comparison of extracellular lactate
+subplot(4,2,3);
 plot(t,y(:,1),'LineWidth', 2);
 hold on
 plot(t,y(:,2),'LineWidth', 2);
@@ -71,11 +66,23 @@ plot(t,y(:,2),'LineWidth', 2);
 % set(h_legend,'FontSize',14)
 xlabel('Time','FontSize',14)
 ylabel('Lactate','FontSize',14)
-title('Lactate ','FontSize',14)
+title('Extracellular lactate ','FontSize',14)
+
+
+% comparison of intracellular lactate
+subplot(4,2,4);
+plot(t,y(:,9),'LineWidth', 2);
+hold on
+plot(t,y(:,10),'LineWidth', 2);
+% h_legend = legend('1st component','2nd component')
+% set(h_legend,'FontSize',14)
+xlabel('Time','FontSize',14)
+ylabel('Lactate','FontSize',14)
+title('Intracellular lactate ','FontSize',14)
 
 
 % comparison of Oxygen
-subplot(3,1,3);
+subplot(4,2,[7 8]);
 plot(t,y(:,5),'LineWidth', 2);set(gca,'FontSize',14)
 hold on
 plot(t,y(:,6),'LineWidth', 2);set(gca,'FontSize',14)
@@ -86,18 +93,38 @@ xlabel('Time','FontSize',14)
 ylabel('Oxygen','FontSize',14)
 title('Oxygen','FontSize',14)
 
-% % comparison of MCT4
-% subplot(2,2,4);
-% plot(t,y(:,5),'LineWidth', 2);
+
+% comparison of MCT4
+subplot(4,2,5);
+plot(t,y(:,7),'LineWidth', 2);set(gca,'FontSize',14)
+hold on
+plot(t,y(:,8),'LineWidth', 2);set(gca,'FontSize',14)
+%plot(t,y(:,7) + y(:,8)); % total population
+% h_legend = legend('1st component','2nd component');
+% set(h_legend,'FontSize',14)
+xlabel('Time','FontSize',14)
+ylabel('MCT4','FontSize',14)
+title('MCT4','FontSize',14)
+
+
+% % comparison of MCT1
+% subplot(4,2,6);
+% plot(t,y(:,9),'LineWidth', 2);set(gca,'FontSize',14)
 % hold on
-% plot(t,y(:,6),'LineWidth', 2);
-% legend('1st component','2nd component')
-% xlabel('time')
-% ylabel('MCT4')
-% title(['MCT4 with fixed oxygen c_1 = ' num2str(oxygen1) ' and c_2 = ' num2str(oxygen2) ' '])
+% plot(t,y(:,10),'LineWidth', 2);set(gca,'FontSize',14)
+% %plot(t,y(:,7) + y(:,8)); % total population
+% h_legend = legend('1st component','2nd component');
+% set(h_legend,'FontSize',14)
+% xlabel('time','FontSize',14)
+% ylabel('MCT1','FontSize',14)
+% title('MCT1','FontSize',14)
 
-function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
 
+
+function deriv = dynamics(t,y,yp,InitialPop)
+
+
+    MCT1 = 1;
 
     deriv=zeros(6,1); % create an empty column vector
 
@@ -133,25 +160,20 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
 %         S2=0;
 %         S2=1*InitialPop;
 %     end
-    
+%     
 
     % when anti-angiogenesis treatment is applied MCT1 and MCT4
-%     % upregulation changes
+    % upregulation changes
 %     if S2 == 0 
-%        MCT11 = 1;
-%        MCT12 = 1;
-%        MCT41 = 0.5;
-%        MCT42 = 1;
+%        MCT11 = 0.145;
+%        MCT12 = 0.1;
+%        MCT41 = 0.1;
+%        MCT42 = 0.145;
 %   
-%      % with these I get a clear advantage  
-% %        MCT11 = 0.5; % since we consider extracelluler this is increased
-% %        as well
-% %        MCT12 = 1;
-% %        MCT41 = 0.3;
-% %        MCT42 = 0.1;
 %     end
     
 
+   
     beta1 = 2.5; %parameter for the hypoxia dependent on HIF-1alpha    
     if t<75000
         k3=0.001; % MCT4 dynamics, factor that shows the dependence of hypoxia
@@ -172,24 +194,24 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
     
     diff21 = BiasOxygenTransport*0.5*InitialPop;
    
-% lactate 1
+% extracellular lactate 1
 
-    deriv(1) = yp(1)-(-omega12*y(1) + omega21 * y(2) + k1*y(3)* MCT41 / (KMAX4 + y(1)) - ...
-        k2*y(3) * y (1) * MCT11  / (KMAX1 + y(1)) - k5 * y(1)); % assume m1 = 1
+    deriv(1) = yp(1)-(-omega12*y(1) + omega21 * y(2) + k1*y(3)* y(7)*y(9) / (KMAX4 + y(9)) - ...
+        k2*y(3) * y (1) * MCT1  / (KMAX1 + y(1)) - k5 * y(1)); % assume m1 = 1
     
 
-% lactate 2      
+% extracellular lactate 2      
 
-    deriv(2) = yp(2)-(-omega21*y(2) + omega12 * y(1) + k1*y(4)* MCT42 / (KMAX4 + y(2)) - ...
-        k2*y(4) * y (2) * MCT12 / (KMAX1 + y(2)) - k5 * y(2));
+    deriv(2) = yp(2)-(-omega21*y(2) + omega12 * y(1) + k1*y(4)* y(8)*y(10) / (KMAX4 + y(10)) - ...
+        k2*y(4) * y (2) * MCT1 / (KMAX1 + y(2)) - k51 * y(2));
  
 % population 1
 
-    deriv(3) = yp(3) - ((birth(y(5)) - death(y(1),y(5))) * y (3));
+    deriv(3) = yp(3) - ((birth(y(5)) - death(y(9),y(5))) * y (3));
 
 % population 2
 
-    deriv(4) = yp(4) - ((birth(y(6)) - death(y(2),y(6))) * y (4));
+    deriv(4) = yp(4) - ((birth(y(6)) - death(y(10),y(6))) * y (4));
     
  % oxygen 1
 
@@ -197,17 +219,56 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
      
  % oxygen 2
      
-     deriv(6) = yp(6) - (S2 - diff21 * y(6) + diff12 * y(5) - k6 * y(4) * y(6));
+    deriv(6) = yp(6) - (S2 - diff21 * y(6) + diff12 * y(5) - k6 * y(4) * y(6));
     
 % % MCT4 1
-% 
-%     deriv(5) = yp(5) - (k3 * h1 /(H0 + h1) - k4 * y (5));
-% 
+ 
+    deriv(7) = yp(7) - (k3 * h1 /(H0 + h1) - k4 * y (7));
+ 
 % % MCT4 2
-% 
-%     deriv(6) = yp(6) - (k3 * h2 /(H0 + h2) - k4 * y (6));
+ 
+    deriv(8) = yp(8) - (k3 * h2 /(H0 + h2) - k4 * y (8));
 
+    %redundant if it is simply other way around, do not need to solve these
+% % MCT1 1
+% 
+%     deriv(9) = yp(9) - (k3 * h2 /(H0 + h2) - k4 * y (9));
+%    % deriv(9) = yp(9) - (k3*y(5)*y(3)/(y(3)+y(4))/(M + y(5)) - k8 * y(9));
+% 
+%     
+% % MCT1 2
+% 
+%   
+%     deriv(10) = yp(10) - (k3 * h1 /(H0 + h1) - k4 * y (10));
+%   %  deriv(10) = yp(10) - (k7(2)*y(6)*y(4)/(y(3)+y(4))/(M + y(6)) - k8 * y(10));
     
+
+
+
+% intracellular lactate 
+
+    % parameters for ODIL
+    S01=10;
+    S02=10;
+
+    c0=0.05;
+    
+    % Oxygen dependent source of intracellular lactate (ODIL)
+    
+    Sl1=S01/(1+(y(5)/c0)); 
+
+    Sl2=S02/(1+(y(6)/c0));
+    
+
+    deriv(9) = yp(9) - (Sl1 - k1 * y(7) * y(3)*y(9)/(KMAX4 + y(9)) + k2*MCT1 * y(3)*y(1)/(KMAX1 +y(1)) - k5 * y(9)); % 1st component
+    
+    deriv(10) = yp(10) - (Sl2 - k1 * y(8) * y(4)*y(10)/(KMAX4 + y(10)) + k2*MCT1 * y(4)*y(2)/(KMAX1 +y(2)) - k5 * y(10)); % 1st component
+
+% intracellular lactate 2
+    
+
+
+
 end
 
 
@@ -229,7 +290,7 @@ end
 function value = death(lactate,oxygen)
 
     nu0 = 5e-4;
-    L0 = 0.2;
+    L0 = 0.2; 
 
     value=nu0*lactate/(L0*oxygen+lactate);
 end

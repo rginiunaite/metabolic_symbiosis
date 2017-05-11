@@ -5,12 +5,14 @@ clear all
 
 
 
-% fixed MCT4
-MCT41 = 0.1;
-MCT42 = 0.1;
 
-MCT11 = 0.1;
-MCT12 = 0.1;
+% note that I have to put here values of MCT which are inside the function
+
+     MCT11 = 1;
+     MCT12 = 1;
+     MCT41 = 0.5;
+     MCT42 = 0.8;
+
 
 
 IC(1) = 0;        % Initial extracellular lactate, 1st compartment
@@ -33,7 +35,7 @@ options=odeset('RelTol',1e-6);
 % 1 corresponds to fixed components, 0 to variable, they are determined
 % using this function
 
-T = 1e5;           % Sets the end of time interval
+T = 1e6;           % Sets the end of time interval
 tspan = [0 T];
 y0 = IC;           % Sets initial condition
 options=odeset('RelTol',1e-4);
@@ -55,12 +57,13 @@ plot(t,y(:,3),'LineWidth', 2); % first population
 hold on
 plot(t,y(:,4),'LineWidth', 2); % second population
 plot(t,y(:,3) + y(:,4),'LineWidth', 2); % total population
-h_legend = legend('1st component','2nd component','Total')
+h_legend = legend('1st component','2nd component','Total');
 set(h_legend,'FontSize',14)
-xlabel('time','FontSize',14)
+%yaxis(0:2200)
+xlabel('Time','FontSize',14)
 ylabel('Population','FontSize',14)
-title(['Populations, final total ' num2str(final_total) ', final 1st component ' num2str(final_normoxic) ', final 2nd component ' num2str(final_hypoxic) ' '],'FontSize',14)
-
+%title(['Populations, final total ' num2str(final_total) ', final 1st component ' num2str(final_normoxic) ', final 2nd component ' num2str(final_hypoxic) ' '],'FontSize',14)
+title({['Populations, final total ' num2str(final_total) ', final 1st component ' num2str(final_normoxic) ', final 2nd component ' num2str(final_hypoxic) ' '],[' MCT1_1 = ' num2str(MCT11) ', MCT1_2 = ' num2str(MCT12) ', MCT4_1 = ' num2str(MCT41), ' MCT4_2 = ' num2str(MCT42) ' ']},'FontSize',14)
 
 
 % comparison of extracellular lactate
@@ -68,9 +71,9 @@ subplot(2,3,4);
 plot(t,y(:,1),'LineWidth', 2);
 hold on
 plot(t,y(:,2),'LineWidth', 2);
-h_legend = legend('1st component','2nd component')
+h_legend = legend('1st component','2nd component');
 set(h_legend,'FontSize',14)
-xlabel('time','FontSize',14)
+xlabel('Time','FontSize',14)
 ylabel('Lactate','FontSize',14)
 title('Extracellular lactate ','FontSize',14)
 
@@ -80,9 +83,9 @@ subplot(2,3,5);
 plot(t,y(:,7),'LineWidth', 2);
 hold on
 plot(t,y(:,8),'LineWidth', 2);
-h_legend = legend('1st component','2nd component')
+h_legend = legend('1st component','2nd component');
 set(h_legend,'FontSize',14)
-xlabel('time','FontSize',14)
+xlabel('Time','FontSize',14)
 ylabel('Lactate','FontSize',14)
 title('Intracellular lactate ','FontSize',14)
 
@@ -95,9 +98,20 @@ plot(t,y(:,6),'LineWidth', 2);set(gca,'FontSize',14)
 %plot(t,y(:,5) + y(:,7)); % total population
 h_legend = legend('1st component','2nd component');
 set(h_legend,'FontSize',14)
-xlabel('time','FontSize',14)
+xlabel('Time','FontSize',14)
 ylabel('Oxygen','FontSize',14)
 title('Oxygen','FontSize',14)
+
+
+
+
+
+% figure
+% plot([0 T],[MCT11 MCT11],[0 T],[MCT12 MCT12],[0 T],[MCT41 MCT41],[0 T],[MCT42 MCT42],'LineWidth',2)
+% hlegend = legend('MCT11','MCT12','MCT41','MCT42')
+% title([' MCT11 = ' num2str(MCT11) ', MCT12 ' num2str(MCT12) ', MCT41 ' num2str(MCT41), ' MCT42 ' num2str(MCT42) ' '],'FontSize',14)
+
+
 
 % % comparison of MCT4
 % subplot(2,2,4);
@@ -150,13 +164,13 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
 
     % when anti-angiogenesis treatment is applied MCT1 and MCT4
     % upregulation changes
-    if S2 == 0 
-       MCT11 = 0.1;
-       MCT12 = 0.1;
-       MCT41 = 0.1;
-       MCT42 = 0.25;
-  
-    end
+%     if S2 == 0 
+%        MCT11 = 0.8;
+%        MCT12 = 0.6;
+%        MCT41 = 0.6;
+%        MCT42 = 0.8;
+%   
+%     end
     
 
     beta1 = 2.5; %parameter for the hypoxia dependent on HIF-1alpha    

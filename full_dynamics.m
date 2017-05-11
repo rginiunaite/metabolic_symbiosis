@@ -26,7 +26,7 @@ options=odeset('RelTol',1e-6);
 % 1 corresponds to fixed components, 0 to variable, they are determined
 % using this function
 
-T = 1e5;           % Sets the end of time interval
+T = 1e4;           % Sets the end of time interval
 tspan = [0 T];
 y0 = IC;           % Sets initial condition
 options=odeset('RelTol',1e-4);
@@ -50,7 +50,7 @@ plot(t,y(:,4),'LineWidth', 2); % second population
 plot(t,y(:,3) + y(:,4),'LineWidth', 2); % total population
 h_legend = legend('1st component','2nd component','Total')
 set(h_legend,'FontSize',14)
-xlabel('time','FontSize',14)
+xlabel('Time','FontSize',14)
 ylabel('Population','FontSize',14)
 title(['Populations, final total ' num2str(final_total) ', final 1st component ' num2str(final_normoxic) ', final 2nd component ' num2str(final_hypoxic) ' '],'FontSize',14)
 
@@ -63,7 +63,7 @@ hold on
 plot(t,y(:,2),'LineWidth', 2);
 h_legend = legend('1st component','2nd component')
 set(h_legend,'FontSize',14)
-xlabel('time','FontSize',14)
+xlabel('Time','FontSize',14)
 ylabel('Lactate','FontSize',14)
 title('Extracellular lactate ','FontSize',14)
 
@@ -75,7 +75,7 @@ hold on
 plot(t,y(:,12),'LineWidth', 2);
 h_legend = legend('1st component','2nd component')
 set(h_legend,'FontSize',14)
-xlabel('time','FontSize',14)
+xlabel('Time','FontSize',14)
 ylabel('Lactate','FontSize',14)
 title('Intracellular lactate ','FontSize',14)
 
@@ -88,7 +88,7 @@ plot(t,y(:,6),'LineWidth', 2);set(gca,'FontSize',14)
 %plot(t,y(:,5) + y(:,7)); % total population
 h_legend = legend('1st component','2nd component');
 set(h_legend,'FontSize',14)
-xlabel('time','FontSize',14)
+xlabel('Time','FontSize',14)
 ylabel('Oxygen','FontSize',14)
 title('Oxygen','FontSize',14)
 
@@ -101,7 +101,7 @@ plot(t,y(:,8),'LineWidth', 2);set(gca,'FontSize',14)
 %plot(t,y(:,7) + y(:,8)); % total population
 h_legend = legend('1st component','2nd component');
 set(h_legend,'FontSize',14)
-xlabel('time','FontSize',14)
+xlabel('Time','FontSize',14)
 ylabel('MCT4','FontSize',14)
 title('MCT4','FontSize',14)
 
@@ -114,7 +114,7 @@ plot(t,y(:,10),'LineWidth', 2);set(gca,'FontSize',14)
 %plot(t,y(:,7) + y(:,8)); % total population
 h_legend = legend('1st component','2nd component');
 set(h_legend,'FontSize',14)
-xlabel('time','FontSize',14)
+xlabel('Time','FontSize',14)
 ylabel('MCT1','FontSize',14)
 title('MCT1','FontSize',14)
 

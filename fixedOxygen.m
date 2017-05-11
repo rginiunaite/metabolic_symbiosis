@@ -2,8 +2,8 @@ clear all
 % Implicit ODE solver
 
 % fixed oxygen
-oxygen1 = 0.5;
-oxygen2 = 0.5;
+oxygen1 = 0.8;
+oxygen2 = 0.2;
 
 IC(1) = 0;        % Initial extracellular lactate, 1st compartment
 IC(2) = 0;        % Initial extracellular lactate, 2nd compartment
@@ -22,15 +22,25 @@ t0 = 0;
 yp0 = [0 0 0 0 0 0 ]; % guess for initial values of derivatives
 options=odeset('RelTol',1e-6);
 [y0,yp0] = decic(@dynamics,t0,IC,[1 1 1 1 1 1 ],yp0,[0 0 0 0 0 0],options,InitialPop,oxygen1,oxygen2);
-% first 4 components fixed, this is maximum, so that one could find consistent initial
-% conditions for both derivative
+% 1 corresponds to fixed components, 0 to variable, they are determined
+% using this function
 
-T = 1e5;           % Sets the end of time interval
+T = 1e6;           % Sets the end of time interval
 tspan = [0 T];
 y0 = IC;           % Sets initial condition
 options=odeset('RelTol',1e-4);
 
 [t,y]=ode15i(@dynamics,tspan,y0,yp0,options,InitialPop,oxygen1,oxygen2);
+
+len = length(y(:,3)); % number of simulations done
+
+final_normoxic = y(len,3);
+final_hypoxic = y(len,4);
+final_total = y(len,3) + y(len,4);
+
+final_normoxic_l = y(len,1);
+final_hypoxic_l = y(len,2);
+%final_total_l = y(len,3) + y(len,4);
 
 
 
@@ -39,35 +49,35 @@ figure
 
 % Population
 subplot(2,2,[1 2]);
-plot(t,y(:,3)); % first population
+plot(t,y(:,3),'LineWidth', 2); % first population
 hold on
-plot(t,y(:,4)); % second population
-plot(t,y(:,3) + y(:,4)); % total population
+plot(t,y(:,4),'LineWidth', 2); % second population
+plot(t,y(:,3) + y(:,4),'LineWidth', 2); % total population
 legend('1st component','2nd component','Total')
-xlabel('time')
+xlabel('Time')
 ylabel('Population')
-title(['Populations with fixed oxygen c_1 = ' num2str(oxygen1) ' and c_2 = ' num2str(oxygen2) ' '])
-
+%title(['Populations with fixed oxygen c_1 = ' num2str(oxygen1) ' and c_2 = ' num2str(oxygen2) ' '])
+title(['Populations, final total ' num2str(final_total) ', final 1st component ' num2str(final_normoxic) ', final 2nd component ' num2str(final_hypoxic) ' '],'FontSize',14)
 
 
 % comparison of lactates
 subplot(2,2,3);
-plot(t,y(:,1));
+plot(t,y(:,1),'LineWidth', 2);
 hold on
-plot(t,y(:,2));
+plot(t,y(:,2),'LineWidth', 2);
 legend('1st component','2nd component')
-xlabel('time')
+xlabel('Time')
 ylabel('Lactate')
 title(['Lactate with fixed oxygen c_1 = ' num2str(oxygen1) ' and c_2 = ' num2str(oxygen2) ' '])
 
 
 % comparison of MCT4
 subplot(2,2,4);
-plot(t,y(:,5));
+plot(t,y(:,5),'LineWidth', 2);
 hold on
-plot(t,y(:,6));
+plot(t,y(:,6),'LineWidth', 2);
 legend('1st component','2nd component')
-xlabel('time')
+xlabel('Time')
 ylabel('MCT4')
 title(['MCT4 with fixed oxygen c_1 = ' num2str(oxygen1) ' and c_2 = ' num2str(oxygen2) ' '])
 
@@ -105,12 +115,11 @@ function deriv = dynamics(t,y,yp,InitialPop,oxygen1, oxygen2)
         S2=1*InitialPop;    % in the hypoxic compartment source is the same
         %up to a certain time
     else
-        S2=0;
-        %  S2=1*InitialPop;
+        %S2=0;
+         S2=1*InitialPop;
     end
 
-    beta1 = 2.5; %parameter for the hypoxia dependent on HIF-1alpha
-    
+    beta1 = 2.5; %parameter for the hypoxia dependent on HIF-1alpha    
     if t<75000
         k3=0.001; % MCT4 dynamics, factor that shows the dependence of hypoxia
         h1=exp(beta1*(1-oxygen1));
@@ -132,14 +141,14 @@ function deriv = dynamics(t,y,yp,InitialPop,oxygen1, oxygen2)
    
 % lactate 1
 
-    deriv(1) = yp(1)-(-omega12*y(1) + omega21 * y(2) + y(3)* y(5) / (KMAX4 + y(1)) - ...
-        y(3) * y (1)  / (KMAX1 + y(1)) - k5 * y(1)); % assume m1 = 1
+    deriv(1) = yp(1)-(-omega12*y(1) + omega21 * y(2) + k1*y(3)* y(5) / (KMAX4 + y(1)) - ...
+        k2*y(3) * y (1)  / (KMAX1 + y(1)) - k5 * y(1)); % assume m1 = 1
     
 
 % lactate 2      
 
-    deriv(2) = yp(2)-(-omega21*y(2) + omega12 * y(1) + y(4)* y(6) / (KMAX4 + y(2)) - ...
-        y(4) * y (2) / (KMAX1 + y(2)) - k5 * y(2));
+    deriv(2) = yp(2)-(-omega21*y(2) + omega12 * y(1) + k1*y(4)* y(6) / (KMAX4 + y(2)) - ...
+        k2*y(4) * y (2) / (KMAX1 + y(2)) - k5 * y(2));
  
 % population 1
 
@@ -187,7 +196,7 @@ end
 function value = death(lactate,oxygen)
 
     nu0 = 5e-4;
-    L0 = 0.1;
+    L0 = 0.2;
 
     value=nu0*lactate/(L0*oxygen+lactate);
 end

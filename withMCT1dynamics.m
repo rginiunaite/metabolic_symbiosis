@@ -16,6 +16,11 @@ IC(8) = 0.1;      % Initial MCT4 2nd compartment
 IC(9)=0.1;          % Initial MCT1 1st component
 IC(10)=0.1;         % Initial MCT1 2nd component
 
+   
+
+
+
+
 InitialPop = IC(3); % have variable for initial population in the first compartment
 
 t0 = 0;
@@ -25,7 +30,7 @@ options=odeset('RelTol',1e-6); % set tolerance for the search of consistent init
 % 1 corresponds to fixed components, 0 to variable, they are determined
 % using this function
 
-T = 100000;         % Sets the end of time interval
+T = 1e10;         % Sets the end of time interval
 tspan = [0 T];
 y0 = IC;           % Sets initial condition
 options=odeset('RelTol',1e-4); %set tolerannce for implicit ode solver
@@ -34,7 +39,23 @@ tic
 [t,y]=ode15i(@dynamics,tspan,y0,yp0,options,InitialPop);
 time = toc;
 
+len = length(y(:,3)); % number of simulations done
 
+final_normoxic = y(len,3);
+final_hypoxic = y(len,4);
+final_total = y(len,3) + y(len,4);
+
+final_normoxic_l = y(len,1);
+final_hypoxic_l = y(len,2);
+
+final_normoxic_c = y(len,5);
+final_hypoxic_c = y(len,6);
+
+final_normoxic_m4 = y(len,7);
+final_hypoxic_m4 = y(len,8);
+
+final_normoxic_m1 = y(len,9);
+final_hypoxic_m1 = y(len,10);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
@@ -51,7 +72,7 @@ h_legend = legend('1st component','2nd component','Total');
 set(h_legend,'FontSize',14)
 xlabel('time','FontSize',14)
 ylabel('Population','FontSize',14)
-title('Populations ','FontSize',14)
+title(['Populations, final total ' num2str(final_total) ', final 1st component ' num2str(final_normoxic) ', final 2nd component ' num2str(final_hypoxic) ' '],'FontSize',14)
 
 
 % comparison of lactates
@@ -60,11 +81,11 @@ plot(t,y(:,1),'LineWidth', 2);set(gca,'FontSize',14)
 hold on
 plot(t,y(:,2),'LineWidth', 2);set(gca,'FontSize',14)
 %plot(t,y(:,1) + y(:,2)); % total population
-h_legend = legend('1st component','2nd component');
-set(h_legend,'FontSize',14)
+%h_legend = legend('1st component','2nd component');
+%set(h_legend,'FontSize',14)
 xlabel('time','FontSize',14)
 ylabel('Lactate','FontSize',14)
-title('Lactate','FontSize',14)
+title(['Lactate, final 1st ' num2str(final_normoxic_l) ', final 2nd ' num2str(final_hypoxic_l) ' '])
 
 
 % comparison of MCT4
@@ -73,11 +94,11 @@ plot(t,y(:,7),'LineWidth', 2);set(gca,'FontSize',14)
 hold on
 plot(t,y(:,8),'LineWidth', 2);set(gca,'FontSize',14)
 %plot(t,y(:,7) + y(:,8)); % total population
-h_legend = legend('1st component','2nd component');
-set(h_legend,'FontSize',14)
+%h_legend = legend('1st component','2nd component');
+%set(h_legend,'FontSize',14)
 xlabel('time','FontSize',14)
 ylabel('MCT4','FontSize',14)
-title('MCT4','FontSize',14)
+title(['MCT4, final 1st ' num2str(final_normoxic_m4) ', final 2nd ' num2str(final_hypoxic_m4) ' '])
 
 % comparison of Oxygen
 subplot(3,2,5);
@@ -85,11 +106,12 @@ plot(t,y(:,5),'LineWidth', 2);set(gca,'FontSize',14)
 hold on
 plot(t,y(:,6),'LineWidth', 2);set(gca,'FontSize',14)
 %plot(t,y(:,5) + y(:,7)); % total population
-h_legend = legend('1st component','2nd component');
-set(h_legend,'FontSize',14)
+%h_legend = legend('1st component','2nd component');
+%set(h_legend,'FontSize',14)
 xlabel('time','FontSize',14)
 ylabel('Oxygen','FontSize',14)
-title('Oxygen','FontSize',14)
+title(['Oxygen, final 1st ' num2str(final_normoxic_c) ', final 2nd ' num2str(final_hypoxic_c) ' '])
+
 
 % comparison of MCT1
 subplot(3,2,6);
@@ -101,7 +123,7 @@ h_legend = legend('1st component','2nd component');
 set(h_legend,'FontSize',14)
 xlabel('time','FontSize',14)
 ylabel('MCT1','FontSize',14)
-title('MCT1','FontSize',14)
+title(['MCT1, final 1st ' num2str(final_normoxic_m1) ', final 2nd ' num2str(final_hypoxic_m1) ' '])
 
 
 
@@ -125,8 +147,8 @@ function deriv = dynamics(t,y,yp,InitialPop)
     omega12=InitialPop; 
     omega21=BiasLactateTransport*InitialPop;
 
-%     omega12=0; % no diffusion of lactate between the two compartments
-%     omega21=0;
+%       omega12=0; % no diffusion of lactate between the two compartments
+%       omega21=0;
 
     k4=0.001; % degradation of MCT4
     
