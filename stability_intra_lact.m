@@ -23,7 +23,7 @@ clear all
     
     %source of oxygen
     S1=1*InitialPop;
-    S2=0.01*InitialPop;
+    S2=0;%0.01*InitialPop;
     % if t<50000
     %   S2=1*InitialPop;
     % else

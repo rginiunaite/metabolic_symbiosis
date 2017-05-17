@@ -103,8 +103,8 @@ clear all
     hold on
     plot([0.5, 0.5],[-2.5*10^-4,0],'r','LineWidth',2)
     plot([0.1 0.5],[0 0],'r','LineWidth',2)
-    xlabel('n_2','FontSize',14)
-    ylabel('f''(n_2)','FontSize',14)
+    xlabel('c_2','FontSize',14)
+    ylabel('b(c_2) - d(l_2,c_2)','FontSize',14)
     title('Stability of the steady state n_2 = 0','FontSize',14)
     grid on
     

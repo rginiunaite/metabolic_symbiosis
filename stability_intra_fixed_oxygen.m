@@ -1,7 +1,8 @@
 clear all
-% fixed MCT
+% fixed oxygen
+% unstable, in particular for which values of MCT4 with respect to MCT1
 % stability analysis with intracellular lactate
-% Both n1 and n2 are non-zero
+% n_2 = 0
 % % note that in this case variables are defined two times: outside functions
 % and inside
 
@@ -59,34 +60,36 @@ clear all
    
    % solve the equation to find steady state oxygen
    i = 0; % for counting
-   range = 0:5:150;
-   %for S2 = range  
-   S2 = 0;
+    c1 = 0.7;
+    range = 0.1:0.1:0.8; 
+ for c2 = range
+   S2 = 1000;
        i=i+1;
-   fun = @(c) oxygen(c,S2);
-   x0 = [0.7,0.3];
-    
-   [c,fval,exitflag,output] = fsolve(fun,x0)
+
       
-   n1(i) = pop1(c(1),c(2))
-   n2(i) = pop2(c(1),c(2))
+   n1(i) = pop1(c1,c2)
+   
+     l_intra1 = lac_intra1(c1,c2)
+     l_intra2 = lac_intra2(c1,c2) 
 
+   stab(i) = (birth(c2) - death (l_intra2,c2))
    
-   l_intra1 = lac_intra(c(1))
-   l_intra2 = lac_intra(c(2))
-    
-%   mct41 = mct4((c(1)))
-%   mct42 = mct4((c(2)))
+  % mct41 = mct4((c(1)))
+  % mct42 = mct4((c(2)))
    
+ end
+   figure
+   plot(range,stab,'Linewidth',2)
+   %h_legend = legend('Population 1','Population 2')
+   %set(h_legend,'Fontsize',14)
+    hold on
+    plot([0.7, 0.7],[-3.5*10^-4,0],'r','LineWidth',2)
+    plot([0.1 0.7],[0 0],'r','LineWidth',2)
    
-
-   %end
-   
-%    plot(range,log(n1),range,log(n2),'Linewidth',2)
-%    h_legend = legend('Population 1','Population 2')
-%    set(h_legend,'Fontsize',14)
-%    xlabel('S2','Fontsize',14)
-%    ylabel('log of steady state populations','Fontsize',14)
+   xlabel('c_2','Fontsize',14)
+   ylabel('b(c_2) - d(l_2,c_2)','Fontsize',14)
+   title('Stability of n_2 = 0 for c_1 = 0.5', 'FontSize',14)
+   grid on
    
     % birth of new cells dependent on oxygen
     function value = birth (oxygen)
@@ -114,26 +117,28 @@ end
 %
 
 
-function value = oxygen(c,S2)
+% function value = oxygen(c,S2)
+% 
+%     InitialPop = 1000;
+%     BiasOxygenTransport=1;
+% 
+%     diff12 = 0.5*InitialPop; % diffusion depends on Initial Poulation in the 1st comp
+%     
+%     diff21 = BiasOxygenTransport*0.5*InitialPop;
+% 
+% 
+%     InitialPop = 1000;
+%     S1=1*InitialPop;
+%     k6 = 1;
+%     %S2 = 0.001*InitialPop;
+%     %S2 = 150;
+%     
+%     value(1) = (S1 +S2 - c(1)*k6*pop1(c(1),c(2)));    
+%     value(2) = S2 + diff12 * c(1) - diff21 *c(2);
+%      
+% end
 
-    InitialPop = 1000;
-    BiasOxygenTransport=1;
 
-    diff12 = 0.5*InitialPop; % diffusion depends on Initial Poulation in the 1st comp
-    
-    diff21 = BiasOxygenTransport*0.5*InitialPop;
-
-
-    InitialPop = 1000;
-    S1=1*InitialPop;
-    k6 = 1;
-    %S2 = 0.001*InitialPop;
-    %S2 = 150;
-    
-    value(1) = (S1 + diff21 *c(2)-diff12*c(1)) -(k6*c(1))* pop1(c(1),c(2));    
-    value(2) = (S2 -diff21*c(2)+diff12*c(1)) -(k6*c(2))* pop2(c(1),c(2)); %first for population 2
-    
-end
 
 
 function val = pop1(c1,c2)
@@ -155,37 +160,48 @@ function val = pop1(c1,c2)
        mct41 = 0.5;
        mct42 = 8.1398e-11;
     
-     val = (source1(c1)- k51 * lac_intra(c1))/(mct41*lac_intra(c1)/(KMAX4 + lac_intra(c1)) - lac_extra1(c1,c2)*mct11/(KMAX1 + lac_extra1(c1,c2)) );
+        val = (-omega12 * lac_extra1(c1,c2) + omega21 * lac_extra2(c1,c2) - ...
+            k5 * lac_extra1(c1,c2))/(-mct4(c1)*lac_intra1(c1,c2)/(KMAX4 + lac_intra1(c1,c2)) +...
+                lac_extra1(c1,c2)*mct11/(KMAX1 + lac_extra1(c1,c2)) );
 end
 
-function val = pop2(c1,c2)
+% population 2 is 0
+% function val = pop2(c1,c2)
+% 
+%     BiasLactateTransport=1; % initially assume there is no bias in lactate transportation
+%     InitialPop = 1000;
+%     % lactate diffusion
+%     omega12=InitialPop; 
+%     omega21=BiasLactateTransport*InitialPop;
+%     
+%     KMAX1=0.1; % parameter for lactate dynamics, dependence on MCT1
+%     KMAX4=0.1; % parameter for lactate dynamics, dependence on MCT4
+%     
+%     k5=0.005*InitialPop; % lactate degradation 
+%     k51=0.005*InitialPop;
+% 
+%        mct11 = 1;
+%        mct12 = 0.6;
+%        mct41 = 0.6;
+%        mct42 = 0.8;
+%     
+%      val = (source2(c2)- k51 * lac_intra(c2))/(mct42*lac_intra(c2)/(KMAX4 + lac_intra(c2)) - lac_extra2(c1,c2)*mct12/(KMAX1 + lac_extra2(c1,c2)) );
+% end
 
-    BiasLactateTransport=1; % initially assume there is no bias in lactate transportation
-    InitialPop = 1000;
-    % lactate diffusion
-    omega12=InitialPop; 
-    omega21=BiasLactateTransport*InitialPop;
-    
-    KMAX1=0.1; % parameter for lactate dynamics, dependence on MCT1
-    KMAX4=0.1; % parameter for lactate dynamics, dependence on MCT4
-    
-    k5=0.005*InitialPop; % lactate degradation 
-    k51=0.005*InitialPop;
-
-       mct11 = 1;
-       mct12 = 1;
-       mct41 = 0.6;
-       mct42 = 0.8;
-    
-     val = (source2(c2)- k51 * lac_intra(c2))/(mct42*lac_intra(c2)/(KMAX4 + lac_intra(c2)) - lac_extra2(c1,c2)*mct12/(KMAX1 + lac_extra2(c1,c2)) );
-end
-
-function val = lac_intra(c)
+function val = lac_intra1(c1,c2)
 
      nu0 = 5e-4;
      L0 = 0.2;
 
-     val = birth(c)*L0*c/(nu0 - birth(c)); 
+     val = birth(c1)*L0*c1/(nu0 - birth(c1)); 
+end
+
+function val = lac_intra2(c1,c2)
+
+    InitialPop = 1000;
+    k51=0.005*InitialPop;
+    val = source2(c2)/k51;
+    
 end
 
 function val = lac_extra1(c1,c2)
@@ -201,9 +217,10 @@ function val = lac_extra1(c1,c2)
     k51=0.005*InitialPop;
 
 
-    val = (omega21*(-source1(c1) + k51 *lac_intra(c1) - source2(c2) + k51 * ...
-        lac_intra(c2)) +k5*(-source1(c1) +k51*lac_intra(c1)))/(-k5*omega21 - k5 * omega12 - k5^2);
 
+    val = (k51 * lac_intra1(c1,c2) - source1(c1))/(omega12 + k5 + omega21/(omega21 + k5));
+   
+    
 end
 
 function val = lac_extra2(c1,c2)
@@ -219,21 +236,21 @@ function val = lac_extra2(c1,c2)
     
     k51=0.005*InitialPop;
 
-    val = (omega12 * lac_extra1(c1,c2) + k5 * lac_extra1(c1,c2) - source1(c1) + k51 * lac_intra(c1))/omega21;
-
+   
+    val = omega12 * lac_extra1(c1,c2)/(omega21 + k5);
 end
 
-% fixed mct4
-% function val = mct4(c)
-% 
-% k4=0.001;
-% k3=0.001;
-% beta1 = 2.5; %parameter for the hypoxia dependent on HIF-1alpha   
-% H0=1;
-%      h2 = exp(beta1*(1-c));
-%      val = h2/(H0+h2) *k3/k4;
-%      
-% end
+
+function val = mct4(c)
+
+k4=0.001;
+k3=0.001;
+beta1 = 2.5; %parameter for the hypoxia dependent on HIF-1alpha   
+H0=1;
+     h2 = exp(beta1*(1-c));
+     val = h2/(H0+h2) *k3/k4;
+     
+end
 
     % Oxygen dependent source of intracellular lactate (ODIL)
     
