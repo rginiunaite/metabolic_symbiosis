@@ -77,11 +77,21 @@ IC(8)=0.1;           % Initial extracellular lactate, 2nd compartment
 InitialPop = IC(3); % have variable for initial population in the first compartment
 
 count = 0;
-for i = 0:6
+for i = 0:100
     
     count = count +1;
-    MCT41 = 0.01 * 2^i;
-    MCT42 = 0.02 * 2^i;
+    
+%     % for relative impact on steady states
+%      MCT41 = 0.01 * 2^i;
+%      MCT42 = 0.02 * 2^i;
+        
+  %  MCT41 = 0.005 * i;
+ %   MCT42 = 0.01 * i;
+    
+    
+    % for the size of MCT4 in one compartment relative to the other (i=0:5)
+    %MCT42 = 0.1*(i+3); % 
+    %MCT41 = 0.5;
     
     fun = @(y) system(y,MCT41, MCT42);
    
@@ -104,11 +114,13 @@ figure
 plot(mct,(final_normoxic),mct,(final_hypoxic),mct,(final_total),'LineWidth', 2)
 h_legend = legend('1st component','2nd component','Total')
 set(h_legend,'FontSize',14)
-xlabel('MCT4','FontSize',14)
-ylabel('Population','FontSize',14)
-title('MCT influence on population sizes','FontSize',14)
-set(gca,'XTick',[1 2 3 4 5 6 7] ); %This are going to be the only values affected.
-set(gca,'XTickLabel',[0.01 0.02 0.04 0.08 0.16 0.32 0.64] ); %This is what it's going to appear in those places.
+xlabel('MCT4_2','FontSize',14)
+ylabel('Steady state population','FontSize',14)
+title('MCT4 influence on population sizes','FontSize',14)
+%set(gca,'XTick',[1 2 3 4 5 6] ); %This are going to be the only values affected.
+%set(gca,'XTickLabel',[0.3 0.4 0.5 0.6 0.7 0.8] ); %This is what it's going to appear in those places.
+set(gca,'XTick',[0 20 40 60 80 100] ); %This are going to be the only values affected.
+set(gca,'XTickLabel',[0 0.1 0.2 0.3 0.4 0.5] ); %This is what it's going to appear in those places.
 grid on
 
 

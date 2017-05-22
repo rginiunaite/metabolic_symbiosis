@@ -2,8 +2,8 @@ clear all
 % Implicit ODE solver
 
 % fixed oxygen
-oxygen1 = 0.8;
-oxygen2 = 0.2;
+oxygen1 = 0.6;
+oxygen2 = 0.6;
 
 IC(1) = 0;        % Initial extracellular lactate, 1st compartment
 IC(2) = 0;        % Initial extracellular lactate, 2nd compartment

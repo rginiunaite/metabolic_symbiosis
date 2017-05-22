@@ -1,36 +1,31 @@
 clear all
-% close all % to delete all figures
 % Implicit ODE solver
-% with MCT1 dynamics
 
 
+oxygen1 = 0.9;
+oxygen2 = 0.1;
 
-IC(1) = 0;        % Initial extracellular lactate, 1st compartment
-IC(2) = 0;        % Initial extracellular lactate, 2nd compartment
+IC(1) = 0.1;        % Initial extracellular lactate, 1st compartment
+IC(2) = 0.1;        % Initial extracellular lactate, 2nd compartment
 IC(3) = 1000;     % Initial population 1st compartment
 IC(4) = 1000;     % Initial population 2nd compartment
 IC(5) = 0.7;      % Initial oxygen 1st compartment    
 IC(6) = 0.3;      % Initial oxygen 2nd compartment  
 IC(7) = 0.1;      % Initial MCT4 1st comparmtent
 IC(8) = 0.1;      % Initial MCT4 2nd compartment
-IC(9)=0.1;          % Initial MCT1 1st component
-IC(10)=0.1;         % Initial MCT1 2nd component
-
-   
-
-
-
+%IC(9)=0;
+%IC(10)=0;
 
 InitialPop = IC(3); % have variable for initial population in the first compartment
 
 t0 = 0;
-yp0 = [0 0 0 0 0 0 0 0 0 0]; % guess for initial values of derivatives
+yp0 = [0 0 0 0 0 0 0 0]; % guess for initial values of derivatives
 options=odeset('RelTol',1e-6); % set tolerance for the search of consistent initial values
-[y0,yp0] = decic(@dynamics,t0,IC,[1 1 1 1 1 1 1 1 1 1],yp0,[0 0 0 0 0 0 0 0 0 0],options,InitialPop);
+[y0,yp0] = decic(@dynamics,t0,IC,[1 1 1 1 1 1 1 1],yp0,[0 0 0 0 0 0 0 0 ],options,InitialPop);
 % 1 corresponds to fixed components, 0 to variable, they are determined
 % using this function
 
-T = 1e5;         % Sets the end of time interval
+T = 1e7;         % Sets the end of time interval
 tspan = [0 T];
 y0 = IC;           % Sets initial condition
 options=odeset('RelTol',1e-4); %set tolerannce for implicit ode solver
@@ -53,21 +48,73 @@ final_hypoxic_c = y(len,6);
 
 final_normoxic_m4 = y(len,7);
 final_hypoxic_m4 = y(len,8);
-
-final_normoxic_m1 = y(len,9);
-final_hypoxic_m1 = y(len,10);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
 % Figures
 figure
 
+% % Population
+% subplot(2,3,[1 3]);
+% plot(t,y(:,3),'LineWidth', 2);set(gca,'FontSize',14); % first population
+% hold on
+% plot(t,y(:,4),'LineWidth', 2);set(gca,'FontSize',14); % second population
+% plot(t,y(:,3) + y(:,4),'LineWidth', 2);set(gca,'FontSize',14); % total population
+% h_legend = legend('1st component','2nd component','Total');
+% set(h_legend,'FontSize',14)
+% xlabel('time','FontSize',14)
+% ylabel('Population','FontSize',14)
+% title(['Populations, final total ' num2str(final_total) ', final 1st component ' num2str(final_normoxic) ', final 2nd component ' num2str(final_hypoxic) ' '],'FontSize',14)
+% 
+% 
+% % comparison of lactates
+% subplot(2,3,4);
+% plot(t,y(:,1),'LineWidth', 2);set(gca,'FontSize',14)
+% hold on
+% plot(t,y(:,2),'LineWidth', 2);set(gca,'FontSize',14)
+% %plot(t,y(:,1) + y(:,2)); % total population
+% %h_legend = legend('1st component','2nd component');
+% %set(h_legend,'FontSize',14)
+% xlabel('Time','FontSize',14)
+% ylabel('Lactate','FontSize',14)
+% title(['Lactate, final 1st ' num2str(final_normoxic_l) ', final 2nd ' num2str(final_hypoxic_l) ' '])
+% 
+% 
+% % comparison of MCT4
+% subplot(2,3,5);
+% plot(t,y(:,7),'LineWidth', 2);set(gca,'FontSize',14)
+% hold on
+% plot(t,y(:,8),'LineWidth', 2);set(gca,'FontSize',14)
+% %plot(t,y(:,7) + y(:,8)); % total population
+% %h_legend = legend('1st component','2nd component');
+% %set(h_legend,'FontSize',14)
+% xlabel('Time','FontSize',14)
+% ylabel('MCT4','FontSize',14)
+% title(['MCT4, final 1st ' num2str(final_normoxic_m4) ', final 2nd ' num2str(final_hypoxic_m4) ' '])
+% 
+% % comparison of Oxygen
+% subplot(2,3,6);
+% plot(t,y(:,5),'LineWidth', 2);set(gca,'FontSize',14)
+% hold on
+% plot(t,y(:,6),'LineWidth', 2);set(gca,'FontSize',14)
+% %plot(t,y(:,5) + y(:,7)); % total population
+% %h_legend = legend('1st component','2nd component');
+% %set(h_legend,'FontSize',14)
+% xlabel('Time','FontSize',14)
+% ylabel('Oxygen','FontSize',14)
+% title(['Oxygen, final 1st ' num2str(final_normoxic_c) ', final 2nd ' num2str(final_hypoxic_c) ' '])
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Figures for comparison of timescales
+
 % Population
-subplot(3,2,[1 2]);
-plot(t,y(:,3),'LineWidth', 2);set(gca,'FontSize',14); % first population
+subplot(4,1,1);
+plot(t,y(:,3)/(y(1,3)+y(1,4)),'LineWidth', 2);set(gca,'FontSize',14); % normalised first population
 hold on
-plot(t,y(:,4),'LineWidth', 2);set(gca,'FontSize',14); % second population
-plot(t,y(:,3) + y(:,4),'LineWidth', 2);set(gca,'FontSize',14); % total population
+plot(t,y(:,4)/(y(1,3)+y(1,4)),'LineWidth', 2);set(gca,'FontSize',14); % second population
+plot(t,(y(:,3) + y(:,4))/(y(1,3)+y(1,4)),'LineWidth', 2);set(gca,'FontSize',14); % total population
 h_legend = legend('1st component','2nd component','Total');
 set(h_legend,'FontSize',14)
 xlabel('time','FontSize',14)
@@ -76,54 +123,47 @@ title(['Populations, final total ' num2str(final_total) ', final 1st component '
 
 
 % comparison of lactates
-subplot(3,2,3);
+subplot(4,1,2);
 plot(t,y(:,1),'LineWidth', 2);set(gca,'FontSize',14)
 hold on
 plot(t,y(:,2),'LineWidth', 2);set(gca,'FontSize',14)
 %plot(t,y(:,1) + y(:,2)); % total population
 %h_legend = legend('1st component','2nd component');
 %set(h_legend,'FontSize',14)
-xlabel('time','FontSize',14)
+xlabel('Time','FontSize',14)
 ylabel('Lactate','FontSize',14)
 title(['Lactate, final 1st ' num2str(final_normoxic_l) ', final 2nd ' num2str(final_hypoxic_l) ' '])
 
 
 % comparison of MCT4
-subplot(3,2,4);
+subplot(4,1,3);
 plot(t,y(:,7),'LineWidth', 2);set(gca,'FontSize',14)
 hold on
 plot(t,y(:,8),'LineWidth', 2);set(gca,'FontSize',14)
 %plot(t,y(:,7) + y(:,8)); % total population
 %h_legend = legend('1st component','2nd component');
 %set(h_legend,'FontSize',14)
-xlabel('time','FontSize',14)
+xlabel('Time','FontSize',14)
 ylabel('MCT4','FontSize',14)
 title(['MCT4, final 1st ' num2str(final_normoxic_m4) ', final 2nd ' num2str(final_hypoxic_m4) ' '])
 
 % comparison of Oxygen
-subplot(3,2,5);
+subplot(4,1,4);
 plot(t,y(:,5),'LineWidth', 2);set(gca,'FontSize',14)
 hold on
 plot(t,y(:,6),'LineWidth', 2);set(gca,'FontSize',14)
 %plot(t,y(:,5) + y(:,7)); % total population
 %h_legend = legend('1st component','2nd component');
 %set(h_legend,'FontSize',14)
-xlabel('time','FontSize',14)
+xlabel('Time','FontSize',14)
 ylabel('Oxygen','FontSize',14)
 title(['Oxygen, final 1st ' num2str(final_normoxic_c) ', final 2nd ' num2str(final_hypoxic_c) ' '])
 
 
-% comparison of MCT1
-subplot(3,2,6);
-plot(t,y(:,9),'LineWidth', 2);set(gca,'FontSize',14)
-hold on
-plot(t,y(:,10),'LineWidth', 2);set(gca,'FontSize',14)
-%plot(t,y(:,5) + y(:,7)); % total population
-h_legend = legend('1st component','2nd component');
-set(h_legend,'FontSize',14)
-xlabel('time','FontSize',14)
-ylabel('MCT1','FontSize',14)
-title(['MCT1, final 1st ' num2str(final_normoxic_m1) ', final 2nd ' num2str(final_hypoxic_m1) ' '])
+
+
+
+
 
 
 
@@ -147,12 +187,12 @@ function deriv = dynamics(t,y,yp,InitialPop)
     omega12=InitialPop; 
     omega21=BiasLactateTransport*InitialPop;
 
-%       omega12=0; % no diffusion of lactate between the two compartments
-%       omega21=0;
+%     omega12=0; % no diffusion of lactate between the two compartments
+%     omega21=0;
 
     k4=0.001; % degradation of MCT4
     
-    H0=0.5; % parameter that influences dynamics of MCT4, how fast it increases 
+    H0=1; % parameter that influences dynamics of MCT4, how fast it increases 
     %as a function of h_i
 
     KMAX1=0.1; % parameter for lactate dynamics, dependence on MCT1
@@ -188,24 +228,30 @@ function deriv = dynamics(t,y,yp,InitialPop)
     diff12 = 0.5*InitialPop; % diffusion depends on Initial Poulation in the 1st comp
     
     diff21 = BiasOxygenTransport*0.5*InitialPop;
-    
-    %parameters for MCT1 dynamics
-    k7 = [0.001, 0.001];
-    k8 = 0.005;
-    M = 0.5;
    
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
-    % dynamics
-    
 % lactate 1
 
-    deriv(1) = yp(1)-(-omega12*y(1) + omega21 * y(2) + y(3)* y(7)*k1 / (KMAX4 + y(1)) - ...
-        y(3) * y (1)*k2 *y(9) / (KMAX1 + y(1)) - k5 * y(1));
+
+    % parameters for ODIL
+    S01=10;
+    S02=10;
+
+    c0=0.05;
+    
+    % Oxygen dependent source of intracellular lactate (ODIL)
+    
+    Sl1=S01/(1+(y(5)/c0)); 
+
+    Sl2=S02/(1+(y(6)/c0));
+
+
+    deriv(1) = yp(1)-(Sl1 -omega12*y(1) + omega21 * y(2) + y(3)* y(7)*k1 / (KMAX4 + y(1)) - ...
+        y(3) * y (1)*k2 / (KMAX1 + y(1)) - k5 * y(1));
         
 % lactate 2      
 
-    deriv(2) = yp(2)-(-omega21*y(2) + omega12 * y(1) + y(4)* y(8)*k1 / (KMAX4 + y(2)) - ...
-        y(4) * y (2)*k2*y(10) / (KMAX1 + y(2)) - k5 * y(2));
+    deriv(2) = yp(2)-(Sl2 -omega21*y(2) + omega12 * y(1) + y(4)* y(8)*k1 / (KMAX4 + y(2)) - ...
+        y(4) * y (2)*k2 / (KMAX1 + y(2)) - k5 * y(2));
  
 % population 1
 
@@ -225,23 +271,13 @@ function deriv = dynamics(t,y,yp,InitialPop)
     
 % MCT4 1
 
-   deriv(7) = yp(7) - (k3 * h1 /(H0 + h1) - k4 * y (7));
-   %  deriv(7) = yp(7) - (y(3)/(y(3)+y(4)) * k3(1) * h1 /(H0 + h1) - k4 * y (7));
+    deriv(7) = yp(7) - (k3 * h1 /(H0 + h1) - k4 * y (7));
 
 % MCT4 2
 
     deriv(8) = yp(8) - (k3 * h2 /(H0 + h2) - k4 * y (8));
-   % deriv(8) = yp(8) - (y(4)/(y(3)+y(4))*k3(2) * h2 /(H0 + h2) - k4 * y (8));
-   
-% MCT1 1
-
-    deriv(9) = yp(9) - (k3 * h2 /(H0 + h2) - k4 * y (9));
-   % deriv(9) = yp(9) - (k3*y(5)*y(3)/(y(3)+y(4))/(M + y(5)) - k8 * y(9));
     
-% MCT1 2
-
-    deriv(10) = yp(10) - (k3 * h1 /(H0 + h1) - k4 * y (10));
-  %  deriv(10) = yp(10) - (k7(2)*y(6)*y(4)/(y(3)+y(4))/(M + y(6)) - k8 * y(10));
+   
     
 end
 
@@ -265,7 +301,7 @@ end
 function value = death(lactate,oxygen)
 
     nu0 = 5e-4;
-    L0 = 0.1;
+    L0 = 0.2;
 
     value=nu0*lactate/(L0*oxygen+lactate);
 end

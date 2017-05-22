@@ -5,8 +5,8 @@ clear all
 oxygen1 = 0.9;
 oxygen2 = 0.1;
 
-IC(1) = 0;        % Initial extracellular lactate, 1st compartment
-IC(2) = 0;        % Initial extracellular lactate, 2nd compartment
+IC(1) = 0.1;        % Initial extracellular lactate, 1st compartment
+IC(2) = 0.1;        % Initial extracellular lactate, 2nd compartment
 IC(3) = 1000;     % Initial population 1st compartment
 IC(4) = 1000;     % Initial population 2nd compartment
 IC(5) = 0.7;      % Initial oxygen 1st compartment    
@@ -25,7 +25,7 @@ options=odeset('RelTol',1e-6); % set tolerance for the search of consistent init
 % 1 corresponds to fixed components, 0 to variable, they are determined
 % using this function
 
-T = 1.5e4;         % Sets the end of time interval
+T = 1e7;         % Sets the end of time interval
 tspan = [0 T];
 y0 = IC;           % Sets initial condition
 options=odeset('RelTol',1e-4); %set tolerannce for implicit ode solver
@@ -200,13 +200,13 @@ function deriv = dynamics(t,y,yp,InitialPop)
 
     S1=1*InitialPop; % source of oxygen depends on how much population I have initially 
      S2 = 0; % no source in hypoxic component
-    if t<50000
-        S2=1*InitialPop;    % in the hypoxic compartment source is the same
-     %   up to a certain time
-    else
-        S2=0;
-        S2=1*InitialPop;
-    end
+%     if t<50000
+%         S2=1*InitialPop;    % in the hypoxic compartment source is the same
+%      %   up to a certain time
+%     else
+%         S2=0;
+%         S2=1*InitialPop;
+%     end
 
     beta1 = 2.5; %parameter for the hypoxia dependent on HIF-1alpha
     
@@ -229,6 +229,18 @@ function deriv = dynamics(t,y,yp,InitialPop)
     
     diff21 = BiasOxygenTransport*0.5*InitialPop;
    
+%         % add source
+%     S01=10;
+%     S02=10;
+% 
+%     c0=0.05;
+%     
+%     % Oxygen dependent source of intracellular lactate (ODIL)
+%     
+%     Sl1=0;%S01/(1+(y(5)/c0)); 
+% 
+%     Sl2=0;%S02/(1+(y(6)/c0));
+    
 % lactate 1
 
     deriv(1) = yp(1)-(-omega12*y(1) + omega21 * y(2) + y(3)* y(7)*k1 / (KMAX4 + y(1)) - ...

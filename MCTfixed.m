@@ -1,15 +1,10 @@
 clear all
 % Implicit ODE solver
 % fixed MCT4 and MCT1 and they are turned on only when S2 = 0 
+% also check how MCT affects total population
 
 
 
-% fixed MCT4
-MCT41 = 0.1;
-MCT42 = 0.1;
-
-MCT11 = 1;
-MCT12 = 1;
 
 
 IC(1) = 0;        % Initial extracellular lactate, 1st compartment
@@ -25,6 +20,27 @@ IC(6) = 0.3;      % Initial oxygen 2nd compartment
 
 InitialPop = IC(3) ; % have variable for initial population in the first compartment
 
+for i=3:3
+  % for i = 0:100
+    
+ %   count = count +1;
+    
+%     % for relative impact on steady states
+%      MCT41 = 0.01 * 2^i;
+%      MCT42 = 0.02 * 2^i;
+        
+  %  MCT41 = 0.005 * i;
+ %   MCT42 = 0.01 * i; 
+    
+   
+    % fixed MCT4
+    MCT41 = 0.000001*10^i;
+    MCT42 = 0.000002*10^i;
+
+    MCT11 = 1;%0.000001*10^i;
+    MCT12 = 1;%0.000001*10^i;
+    
+    
 t0 = 0;
 yp0 = [0 0 0 0 0 0]; % guess for initial values of derivatives
 options=odeset('RelTol',1e-6);
@@ -32,7 +48,7 @@ options=odeset('RelTol',1e-6);
 % 1 corresponds to fixed components, 0 to variable, they are determined
 % using this function
 
-T = 1e7;           % Sets the end of time interval
+T = 1e6;           % Sets the end of time interval
 tspan = [0 T];
 y0 = IC;           % Sets initial condition
 options=odeset('RelTol',1e-4);
@@ -41,9 +57,27 @@ options=odeset('RelTol',1e-4);
 
 len = length(y(:,3)); % number of simulations done
 
-final_normoxic = y(len,3);
-final_hypoxic = y(len,4);
-final_total = y(len,3) + y(len,4);
+final_normoxic(i) = y(len,3);
+final_hypoxic(i) = y(len,4);
+final_total(i) = y(len,3) + y(len,4);
+
+
+end
+mct=1:i;
+figure 
+plot(mct,log(final_normoxic),mct,log(final_hypoxic),mct,log(final_total),'LineWidth', 2)
+h_legend = legend('1st component','2nd component','Total')
+set(h_legend,'FontSize',14)
+xlabel('MCT','FontSize',14)
+ylabel('log(Population)','FontSize',14)
+title(['MCT influence on population sizes, final total ' num2str(final_total(i)) ', final normoxic ' num2str(final_normoxic(i)) ', final hypoxic ' num2str(final_hypoxic(i)) ' '],'FontSize',14)
+set(gca,'XTick',[1 2 3 4 5 6] ); %This are going to be the only values affected.
+set(gca,'XTickLabel',[10^-5 10^-4 10^-3 10^-2 10^-1 1] ); %This is what it's going to appear in those places.
+grid on
+
+
+
+
 
 % total population
 figure
@@ -58,7 +92,7 @@ h_legend = legend('1st component','2nd component','Total')
 set(h_legend,'FontSize',14)
 xlabel('Time','FontSize',14)
 ylabel('Population','FontSize',14)
-title(['Populations, final total ' num2str(final_total) ', final 1st component ' num2str(final_normoxic) ', final 2nd component ' num2str(final_hypoxic) ' '],'FontSize',14)
+title(['Populations, final total ' num2str(final_total(i)) ', final 1st component ' num2str(final_normoxic(i)) ', final 2nd component ' num2str(final_hypoxic(i)) ' '],'FontSize',14)
 
 
 
@@ -135,22 +169,7 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
 %     end
     
 
-    % when anti-angiogenesis treatment is applied MCT1 and MCT4
-%     % upregulation changes
-%     if S2 == 0 
-%        MCT11 = 1;
-%        MCT12 = 1;
-%        MCT41 = 0.5;
-%        MCT42 = 1;
-%   
-%      % with these I get a clear advantage  
-% %        MCT11 = 0.5; % since we consider extracelluler this is increased
-% %        as well
-% %        MCT12 = 1;
-% %        MCT41 = 0.3;
-% %        MCT42 = 0.1;
-%     end
-    
+
 
     beta1 = 2.5; %parameter for the hypoxia dependent on HIF-1alpha    
     if t<75000
@@ -174,13 +193,27 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
    
 % lactate 1
 
-    deriv(1) = yp(1)-(-omega12*y(1) + omega21 * y(2) + k1*y(3)* MCT41 / (KMAX4 + y(1)) - ...
+
+    % add source
+    S01=10;
+    S02=10;
+
+    c0=0.05;
+    
+    % Oxygen dependent source of intracellular lactate (ODIL)
+    
+    Sl1=S01/(1+(y(5)/c0)); 
+
+    Sl2=S02/(1+(y(6)/c0));
+
+
+    deriv(1) = yp(1)-(Sl1 -omega12*y(1) + omega21 * y(2) + k1* MCT41*y(3) / (KMAX4 + y(1)) - ...
         k2*y(3) * y (1) * MCT11  / (KMAX1 + y(1)) - k5 * y(1)); % assume m1 = 1
     
 
 % lactate 2      
 
-    deriv(2) = yp(2)-(-omega21*y(2) + omega12 * y(1) + k1*y(4)* MCT42 / (KMAX4 + y(2)) - ...
+    deriv(2) = yp(2)-(Sl2 -omega21*y(2) + omega12 * y(1) + k1* MCT42*y(4) / (KMAX4 + y(2)) - ...
         k2*y(4) * y (2) * MCT12 / (KMAX1 + y(2)) - k5 * y(2));
  
 % population 1

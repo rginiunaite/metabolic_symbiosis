@@ -11,14 +11,14 @@ clear all
      MCT11 = 1;
      MCT12 = 1;
      MCT41 = 0.5;
-     MCT42 = 0.8;
+     MCT42 = 1;
 
 
 
 IC(1) = 0;        % Initial extracellular lactate, 1st compartment
 IC(2) = 0;        % Initial extracellular lactate, 2nd compartment
-IC(3) = 1000;     % Initial population 1st compartment
-IC(4) = 1000;        % Initial population 2nd compartment
+IC(3) = 500;     % Initial population 1st compartment
+IC(4) = 500;        % Initial population 2nd compartment
 IC(5) = 0.7;      % Initial oxygen 1st compartment    
 IC(6) = 0.3;      % Initial oxygen 2nd compartment  
 %IC(5) = 0.1;     % Initial MCT4 1st comparmtent
@@ -35,7 +35,7 @@ options=odeset('RelTol',1e-6);
 % 1 corresponds to fixed components, 0 to variable, they are determined
 % using this function
 
-T = 1e6;           % Sets the end of time interval
+T = 1e3;           % Sets the end of time interval
 tspan = [0 T];
 y0 = IC;           % Sets initial condition
 options=odeset('RelTol',1e-4);
@@ -247,7 +247,6 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
     
     deriv(8) = yp(8) - (Sl2 - k1 * MCT42 * y(4)*y(8)/(KMAX4 + y(8)) + k2*MCT12 * y(4)*y(2)/(KMAX1 +y(2)) - k5 * y(8)); % 1st component
 
-% intracellular lactate 2
     
 
 

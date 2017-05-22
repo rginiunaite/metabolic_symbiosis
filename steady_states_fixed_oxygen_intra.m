@@ -9,8 +9,8 @@ clear all
     % fixed oxygen (temporal)
     
     % do not forget to change inside the function too
-    oxygen1= 0.8;
-    oxygen2 =0.2;
+    oxygen1= 0.7;
+    oxygen2 =0.3;
 
 
     MCT11 = 1;
@@ -72,8 +72,8 @@ IC(4) = 1;         % Initial population 2nd compartment % similar to solution
 %IC(6) = 0.3;      % Initial oxygen 2nd compartment  
 IC(5) = 0.1;       % Initial MCT4 1st comparmtent
 IC(6) = 0.1;       % Initial MCT4 2nd compartment
-IC(7)=0;           % Initial extracellular lactate, 1st compartment
-IC(8)=0;           % Initial extracellular lactate, 2nd compartment
+IC(7)=0;           % Initial intracellular lactate, 1st compartment
+IC(8)=0;           % Initial intracellular lactate, 2nd compartment
 
 
 InitialPop = IC(3); % have variable for initial population in the first compartment
@@ -127,8 +127,8 @@ function value = system(y)
 
     % fixed oxygen
     
-    oxygen1= 0.5;
-    oxygen2 =0.5;
+    oxygen1= 0.7;
+    oxygen2 =0.3;
 
 
     MCT11 = 1;
