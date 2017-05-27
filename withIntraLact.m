@@ -10,15 +10,15 @@ clear all
 
      MCT11 = 1;
      MCT12 = 1;
-     MCT41 = 0.5;
-     MCT42 = 1;
+     MCT41 = 0.6;
+     MCT42 = 1.2;
 
 
 
 IC(1) = 0;        % Initial extracellular lactate, 1st compartment
 IC(2) = 0;        % Initial extracellular lactate, 2nd compartment
-IC(3) = 500;     % Initial population 1st compartment
-IC(4) = 500;        % Initial population 2nd compartment
+IC(3) = 1000;     % Initial population 1st compartment
+IC(4) = 1000;     % Initial population 2nd compartment
 IC(5) = 0.7;      % Initial oxygen 1st compartment    
 IC(6) = 0.3;      % Initial oxygen 2nd compartment  
 %IC(5) = 0.1;     % Initial MCT4 1st comparmtent
@@ -35,7 +35,7 @@ options=odeset('RelTol',1e-6);
 % 1 corresponds to fixed components, 0 to variable, they are determined
 % using this function
 
-T = 1e3;           % Sets the end of time interval
+T = 1e5;           % Sets the end of time interval
 tspan = [0 T];
 y0 = IC;           % Sets initial condition
 options=odeset('RelTol',1e-4);
@@ -71,8 +71,8 @@ subplot(2,3,4);
 plot(t,y(:,1),'LineWidth', 2);
 hold on
 plot(t,y(:,2),'LineWidth', 2);
-h_legend = legend('1st component','2nd component');
-set(h_legend,'FontSize',14)
+% h_legend = legend('1st component','2nd component');
+% set(h_legend,'FontSize',14)
 xlabel('Time','FontSize',14)
 ylabel('Lactate','FontSize',14)
 title('Extracellular lactate ','FontSize',14)
@@ -83,8 +83,8 @@ subplot(2,3,5);
 plot(t,y(:,7),'LineWidth', 2);
 hold on
 plot(t,y(:,8),'LineWidth', 2);
-h_legend = legend('1st component','2nd component');
-set(h_legend,'FontSize',14)
+% h_legend = legend('1st component','2nd component');
+% set(h_legend,'FontSize',14)
 xlabel('Time','FontSize',14)
 ylabel('Lactate','FontSize',14)
 title('Intracellular lactate ','FontSize',14)
@@ -96,8 +96,8 @@ plot(t,y(:,5),'LineWidth', 2);set(gca,'FontSize',14)
 hold on
 plot(t,y(:,6),'LineWidth', 2);set(gca,'FontSize',14)
 %plot(t,y(:,5) + y(:,7)); % total population
-h_legend = legend('1st component','2nd component');
-set(h_legend,'FontSize',14)
+% h_legend = legend('1st component','2nd component');
+% set(h_legend,'FontSize',14)
 xlabel('Time','FontSize',14)
 ylabel('Oxygen','FontSize',14)
 title('Oxygen','FontSize',14)
@@ -137,8 +137,8 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
     BiasLactateTransport=1; % initially assume there is no bias in lactate transportation
 
     % lactate diffusion
-    omega12=InitialPop; 
-    omega21=BiasLactateTransport*InitialPop;
+    omega12=1000;%InitialPop; 
+    omega21=1000;%BiasLactateTransport*InitialPop;
 
 %     omega12=0;
 %     omega21=0;
@@ -150,6 +150,11 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
 
     KMAX1=0.1; % parameter for lactate dynamics, dependence on MCT1
     KMAX4=0.1; % parameter for lactate dynamics, dependence on MCT4
+   
+    VM4 = 1;
+    VM1 = 1;
+    
+    
 
     S1=1*InitialPop; % source of oxygen depends on how much population I have initially 
    S2 = 0; % when anitangiogenesis treatment is applied, no oxygen source to the second component
@@ -189,20 +194,20 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
 
     BiasOxygenTransport=1;
 
-    diff12 = 0.5*InitialPop; % diffusion depends on Initial Poulation in the 1st comp
+    diff12 = 100;%0.5*InitialPop; % diffusion depends on Initial Poulation in the 1st comp
     
-    diff21 = BiasOxygenTransport*0.5*InitialPop;
+    diff21 = 100;%0.5*BiasOxygenTransport*InitialPop;
    
 % extracellular lactate 1
 
-    deriv(1) = yp(1)-(-omega12*y(1) + omega21 * y(2) + k1*y(3)* MCT41*y(7) / (KMAX4 + y(7)) - ...
-        k2*y(3) * y (1) * MCT11  / (KMAX1 + y(1)) - k5 * y(1)); % assume m1 = 1
+    deriv(1) = yp(1)-(-omega12*y(1) + omega21 * y(2) + k1*y(3)* MCT41*y(7)*VM4 / (KMAX4 + y(7)) - ...
+        VM1*y(3) * y (1) * MCT11  / (KMAX1 + y(1)) - k5 * y(1)); % assume m1 = 1
     
 
 % extracellular lactate 2      
 
-    deriv(2) = yp(2)-(-omega21*y(2) + omega12 * y(1) + k1*y(4)* MCT42*y(8) / (KMAX4 + y(8)) - ...
-        k2*y(4) * y (2) * MCT12 / (KMAX1 + y(2)) - k51 * y(2));
+    deriv(2) = yp(2)-(-omega21*y(2) + omega12 * y(1) + k1*y(4)* MCT42*y(8)*VM4 / (KMAX4 + y(8)) - ...
+        VM1*y(4) * y (2) * MCT12 / (KMAX1 + y(2)) - k51 * y(2));
  
 % population 1
 
@@ -243,9 +248,9 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
     Sl2=S02/(1+(y(6)/c0));
     
 
-    deriv(7) = yp(7) - (Sl1 - k1 * MCT41 * y(3)*y(7)/(KMAX4 + y(7)) + k2*MCT11 * y(3)*y(1)/(KMAX1 +y(1)) - k5 * y(7)); % 1st component
+    deriv(7) = yp(7) - (Sl1 - VM4 * MCT41 * y(3)*y(7)/(KMAX4 + y(7)) + VM1*MCT11 * y(3)*y(1)/(KMAX1 +y(1)) - k5 * y(7)); % 1st component
     
-    deriv(8) = yp(8) - (Sl2 - k1 * MCT42 * y(4)*y(8)/(KMAX4 + y(8)) + k2*MCT12 * y(4)*y(2)/(KMAX1 +y(2)) - k5 * y(8)); % 1st component
+    deriv(8) = yp(8) - (Sl2 - VM4 * MCT42 * y(4)*y(8)/(KMAX4 + y(8)) + VM1*MCT12 * y(4)*y(2)/(KMAX1 +y(2)) - k5 * y(8)); % 1st component
 
     
 
@@ -258,7 +263,7 @@ end
 function value = birth (oxygen)
 
     % parameter values from de la Cruz et al. JTB (2016)
-
+    
     exponent = -0.2;
     a0 = 8.25e3;
     oxycr = 0.02;
