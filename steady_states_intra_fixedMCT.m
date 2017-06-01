@@ -6,8 +6,6 @@ clear all
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %parameters
-    % fixed oxygen (temporal)
-    
 
 
     
@@ -56,14 +54,45 @@ clear all
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
+% initial conditions for KMAX1 varying
+% IC(1) = 0.1;       % Initial extracellular lactate, 1st compartment
+% IC(2) = 0.1;       % Initial extracellular lactate, 2nd compartment
+% choose carefully
+% for KMAX need something as big as 6000 500, for mct 0.6, 1.2, 1, 1
+% IC(3) = 6000;         % Initial population 1st compartment % similar to solution
+% IC(4) = 50;         % Initial population 2nd compartment % similar to solution
+% IC(5) = 0.5;      % Initial oxygen 1st compartment    
+% IC(6) = 0.4;      % Initial oxygen 2nd compartment  
+% IC(5) = 0.1;       % Initial MCT4 1st comparmtent
+% (6) = 0.1;       % Initial MCT4 2nd compartment
+% IC(7)=0.1;           % Initial extracellular lactate, 1st compartment
+% IC(8)=0.1;    
 
 
+
+
+% IC(1) = 0.4;       % Initial extracellular lactate, 1st compartment
+% IC(2) = 0.4;       % Initial extracellular lactate, 2nd compartment
+% % choose carefully
+% % for KMAX need something as big as 6000 500, for mct 0.6, 1.2, 1, 1
+% IC(3) = 6500;         % Initial population 1st compartment % similar to solution
+% IC(4) = 100;         % Initial population 2nd compartment % similar to solution
+% IC(5) = 0.5;      % Initial oxygen 1st compartment    
+% IC(6) = 0.4;      % Initial oxygen 2nd compartment  
+% %IC(5) = 0.1;       % Initial MCT4 1st comparmtent
+% %(6) = 0.1;       % Initial MCT4 2nd compartment
+% IC(7)=0.1;           % Initial extracellular lactate, 1st compartment
+% IC(8)=0.1;           % Initial extracellular lactate, 2nd compartment
+% 
+
+% initial conditions for varying MCT4 % parameters from the table, week 5
+% update
 IC(1) = 0.1;       % Initial extracellular lactate, 1st compartment
 IC(2) = 0.1;       % Initial extracellular lactate, 2nd compartment
 % choose carefully
-% for KMAX need something as big as 6000 500
+% for KMAX need something as big as for alpha 03 take 5000 5000
 IC(3) = 5000;         % Initial population 1st compartment % similar to solution
-IC(4) = 500;         % Initial population 2nd compartment % similar to solution
+IC(4) = 5000;         % Initial population 2nd compartment % similar to solution
 IC(5) = 0.7;      % Initial oxygen 1st compartment    
 IC(6) = 0.3;      % Initial oxygen 2nd compartment  
 %IC(5) = 0.1;       % Initial MCT4 1st comparmtent
@@ -72,21 +101,30 @@ IC(7)=0.1;           % Initial extracellular lactate, 1st compartment
 IC(8)=0.1;           % Initial extracellular lactate, 2nd compartment
 
 
+
+
 InitialPop = IC(3); % have variable for initial population in the first compartment
 
 count = 0;
-MCT11 = 1;
-MCT12 = 1;
-MCT41 = 0.6; % optimal for general case, consider what happens
-MCT42 = 1.2;
+% MCT11 = 1;
+% MCT12 = 1;
+% MCT41 = 0.6; % optimal for general case, consider what happens
+% MCT42 = 1.2;
+
+%      alpha = 0.5;
+%      MCT42 = 1;
+%      MCT11 = MCT42;
+%      MCT12 = MCT42*alpha;
+%      MCT41 = MCT42*alpha;
+
 
 
 VM4 = 1;
 VM1 = 1;
 KMAX1=0.1; % parameter for lactate dynamics, dependence on MCT1
-KMAX4=1; % parameter for lactate dynamics, dependence on MCT4
+KMAX4=0.1; % parameter for lactate dynamics, dependence on MCT4
 
-NumberOfIterations = 100;
+NumberOfIterations = 60;
 
 % initialising final quantities to increase speed
 final_normoxic = zeros(1,NumberOfIterations);
@@ -104,34 +142,62 @@ for i = 0:NumberOfIterations %%% this is for VM1[0.5 1 10 100]
     
     count = count +1;
     
-%   % varying KMAX4
+% %   % varying KMAX4
 %   KMAX4 = 0.1*i;
 %     
 %   % instead of zero take something very small
 %     if i == 0
 %        KMAX4 = 0.05;
 %     end
-    
+%     
    
       % varying KMAX1
-  %   KMAX1 = 0.1*i; % this was not good at all
-    
+%     KMAX1 = 0.1*i; % this was not good at all
+%     
 %   % instead of zero take something very small
 %     if i == 0
 %        KMAX1 = 0.05;
-%    end
+%     end
 
+   %%%%%%%%% 
+   % MCT chosen using ratios
+%    alpha = 0.3;
+% 
+%    MCT42 = 0.01 * i;
+%    
+%    if i == 0
+%        MCT42 = 0.005;
+%    end   
+%    
+%    MCT41 = alpha * MCT42;
+%      
+%    MCT11 = MCT42; % varying MCT1 as well in mutually exclusive regions
+%    MCT12 = alpha * MCT42;
+   
 
+   % MCT chosen using differences
+     m = 0.01 * i;
+   
+     if i == 0
+        m = 0.005;
+     end   
+     
+     
+     beta = 0.8;
+     eps = beta*m; % when relative to the increase
+     %eps = 0;
+     MCT42 = m+eps;
+     MCT11 = m;
+     MCT12 = m;
+     MCT41 = m-eps;
     
-   MCT11 = 0.01 * i; % varying MCT1 as well in mutually exclusive regions
-   MCT12 = 0.005 * i;
+   
    
    %VM4 = 0.01*i;
    
    % VM1 = i;
 
-    MCT41 = 0.005 * i;
-    MCT42 = 0.01 * i;
+
     
    
     % for the size of MCT4 in one compartment relative to the other (i=0:5)
@@ -174,19 +240,22 @@ subplot(4,1,1)
 plot(mct,(final_normoxic),mct,(final_hypoxic),mct,(final_total),'LineWidth', 2)
 h_legend = legend('1st compartment','2nd compartment','Total');
 set(h_legend,'FontSize',14)
-xlabel('MCT4_2','FontSize',14)
+%xlabel('MCT4_2','FontSize',14)
+xlabel('m','FontSize',14)
 %xlabel('V_{M_4}','FontSize',14)
 %xlabel('K_{M_4}','FontSize',14)
+%xlabel('K_{M_1}','FontSize',14)
 %xlabel('V_{M_1}','FontSize',14)
 
 ylabel('St. st. population','FontSize',14)
 %title(['MCT4 influence on population sizes, MCT1 = ', num2str(MCT11)],'FontSize',14)
-title('MCT4 and MCT1 influence on population sizes','FontSize',14)
+title(['MCT4 and MCT1 influence on population sizes, final total ' num2str(final_total(count)) ],'FontSize',14)
 %title('V_{M_4} influence on population sizes','FontSize',14)
 %title('K_{M_4} influence on population sizes','FontSize',14)
+%title('K_{M_1} influence on population sizes','FontSize',14)
 %title('V_{M_1} influence on population sizes','FontSize',14)
 
-%This are going to be the only values affected for the case when varying MCT4
+%%This are going to be the only values affected for the case when varying MCT4
 set(gca,'XTick',[0:20:400] ); 
 set(gca,'XTickLabel',[0:0.2:4] ); 
 grid on
@@ -200,6 +269,11 @@ grid on
 % set(gca,'XTickLabel',[0:10*0.1:NumberOfIterations*0.1] );
 % grid on
 
+%  % for varying KM1
+%  set(gca,'XTick',[15:10:NumberOfIterations] );
+%  set(gca,'XTickLabel',[15*0.1:10*0.1:NumberOfIterations*0.1] );
+%  grid on
+
 % % for varying VM1
 % set(gca,'XTick',[0:4] );
 % set(gca,'XTickLabel',[0.1 1 10 100] );
@@ -210,18 +284,21 @@ subplot(4,1,2)
 plot(mct,(final_normoxic_EL),mct,(final_hypoxic_EL),'LineWidth', 2)
 % h_legend = legend('1st component','2nd component','Total');
 % set(h_legend,'FontSize',14)
-xlabel('MCT4_2','FontSize',14)
+%xlabel('MCT4_2','FontSize',14)
+xlabel('m','FontSize',14)
 %xlabel('V_{M_4}','FontSize',14)
 %xlabel('K_{M_4}','FontSize',14)
+%xlabel('K_{M_1}','FontSize',14)
 %xlabel('V_{M_1}','FontSize',14)
 
 ylabel('St. st. extra lac','FontSize',14)
 title('MCT4 and MCT1 influence on extracellular lactate','FontSize',14)
 %title('V_{M_4} influence on extracellular lactate','FontSize',14)
 %title('K_{M_4} influence on extracellular lactate','FontSize',14)
+%title('K_{M_1} influence on extracellular lactate','FontSize',14)
 %title('V_{M_1} influence on extracellular lactate','FontSize',14)
 
-%MCT4 axis
+% %MCT4 axis
 set(gca,'XTick',[0:20:400] ); %This are going to be the only values affected.
 set(gca,'XTickLabel',[0:0.2:4] ); %This is what it's going to appear in those places.
 grid on
@@ -234,6 +311,11 @@ grid on
 % set(gca,'XTick',[0:10:NumberOfIterations] );
 % set(gca,'XTickLabel',[0:10*0.1:NumberOfIterations*0.1] );
 % grid on
+
+ % for varying KM1
+%  set(gca,'XTick',[15:10:NumberOfIterations] );
+%  set(gca,'XTickLabel',[15*0.1:10*0.1:NumberOfIterations*0.1] );
+%  grid on
 
 % % for varying VM1
 % set(gca,'XTick',[0:4] );
@@ -246,18 +328,21 @@ subplot(4,1,3)
 plot(mct,(final_normoxic_IL),mct,(final_hypoxic_IL),'LineWidth', 2)
 % h_legend = legend('1st component','2nd component','Total');
 % set(h_legend,'FontSize',14)
-xlabel('MCT4_2','FontSize',14)
+%xlabel('MCT4_2','FontSize',14)
+xlabel('m','FontSize',14)
 %xlabel('V_{M_4}','FontSize',14)
 %xlabel('K_{M_4}','FontSize',14)
+%xlabel('K_{M_1}','FontSize',14)
 %xlabel('V_{M_1}','FontSize',14)
 
 ylabel('St. st. intra lac','FontSize',14)
 title('MCT4 and MCT1 influence on intracellular lactate','FontSize',14)
 %title('V_{M_4} influence on intracellular lactate','FontSize',14)
 %title('K_{M_4} influence on intracellular lactate','FontSize',14)
+%title('K_{M_1} influence on intracellular lactate','FontSize',14)
 %title('V_{M_1} influence on intracellular lactate','FontSize',14)
 
-% for MCT4
+% % for MCT4
 set(gca,'XTick',[0:20:400] ); %This are going to be the only values affected.
 set(gca,'XTickLabel',[0:0.2:4] ); %This is what it's going to appear in those places.
 grid on
@@ -271,6 +356,11 @@ grid on
 % set(gca,'XTickLabel',[0:10*0.1:NumberOfIterations*0.1] );
 % grid on
 
+ % for varying KM1
+%  set(gca,'XTick',[15:10:NumberOfIterations] );
+%  set(gca,'XTickLabel',[15*0.1:10*0.1:NumberOfIterations*0.1] );
+%  grid on
+
 % % for varying VM1
 % set(gca,'XTick',[0:4] );
 % set(gca,'XTickLabel',[0.1 1 10 100] );
@@ -281,9 +371,11 @@ subplot(4,1,4)
 plot(mct,(final_normoxic_O),mct,(final_hypoxic_O),'LineWidth', 2)
 % h_legend = legend('1st component','2nd component','Total');
 % set(h_legend,'FontSize',14)
-xlabel('MCT4_2','FontSize',14)
+%xlabel('MCT4_2','FontSize',14)
+xlabel('m','FontSize',14)
 %xlabel('V_{M_4}','FontSize',14)
 %xlabel('K_{M_4}','FontSize',14)
+%xlabel('K_{M_1}','FontSize',14)
 %xlabel('V_{M_1}','FontSize',14)
 
 ylabel('St. st. oxygen','FontSize',14)
@@ -291,9 +383,10 @@ ylabel('St. st. oxygen','FontSize',14)
 title('MCT4 and MCT1 influence on oxygen','FontSize',14)
 %title('V_{M_4} influence on oxygen','FontSize',14)
 %title('K_{M_4} influence on oxygen','FontSize',14)
+%title('K_{M_4} influence on oxygen','FontSize',14)
 %title('V_{M_1} influence on oxygen','FontSize',14)
 
-%varying MCT4
+% %varying MCT4
 set(gca,'XTick',[0:20:400] ); %This are going to be the only values affected.
 set(gca,'XTickLabel',[0:0.2:4] ); %This is what it's going to appear in those places.
 grid on
@@ -302,10 +395,15 @@ grid on
 % set(gca,'XTickLabel',[0:10*0.01:NumberOfIterations*0.01] );
 % grid on
 
-% % for varying VM4
+% % for varying KM4
 % set(gca,'XTick',[0:10:NumberOfIterations] );
 % set(gca,'XTickLabel',[0:10*0.1:NumberOfIterations*0.1] );
 % grid on
+
+ % for varying KM1
+%  set(gca,'XTick',[15:10:NumberOfIterations] );
+%  set(gca,'XTickLabel',[15*0.1:10*0.1:NumberOfIterations*0.1] );
+%  grid on
 
 % % for varying VM1
 % set(gca,'XTick',[0:4] );
@@ -538,8 +636,3 @@ function value = lactate_source2(oxygen)
 
     value=S02/(1+(oxygen/c0));
 end
-
-
-
-
-
