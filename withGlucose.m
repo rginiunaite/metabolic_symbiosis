@@ -69,7 +69,7 @@ final_total = y(len,3) + y(len,4);
 figure
 
 % Population
-subplot(2,3,[1 3]);
+subplot(3,3,[1 3]);
 plot(t,y(:,3),'LineWidth', 2); % first population
 hold on
 plot(t,y(:,4),'LineWidth', 2); % second population
@@ -85,7 +85,7 @@ title({['Populations, final total ' num2str(final_total) ', final 1st compartmen
 
 
 % comparison of extracellular lactate
-subplot(2,3,4);
+subplot(3,3,4);
 plot(t,y(:,1),'LineWidth', 2);
 hold on
 plot(t,y(:,2),'LineWidth', 2);
@@ -97,7 +97,7 @@ title('Extracellular lactate ','FontSize',14)
 
 
 % comparison of intracellular lactate
-subplot(2,3,5);
+subplot(3,3,5);
 plot(t,y(:,7),'LineWidth', 2);
 hold on
 plot(t,y(:,8),'LineWidth', 2);
@@ -109,7 +109,7 @@ title('Intracellular lactate ','FontSize',14)
 
 
 % comparison of Oxygen
-subplot(2,3,6);
+subplot(3,3,6);
 plot(t,y(:,5),'LineWidth', 2);set(gca,'FontSize',14)
 hold on
 plot(t,y(:,6),'LineWidth', 2);set(gca,'FontSize',14)
@@ -121,7 +121,17 @@ ylabel('Oxygen','FontSize',14)
 title('Oxygen','FontSize',14)
 
 
-
+% comparison of Glucose
+subplot(3,3,[7 9]);
+plot(t,y(:,9),'LineWidth', 2);set(gca,'FontSize',14)
+hold on
+plot(t,y(:,10),'LineWidth', 2);set(gca,'FontSize',14)
+%plot(t,y(:,5) + y(:,7)); % total population
+% h_legend = legend('1st component','2nd component');
+% set(h_legend,'FontSize',14)
+xlabel('Time','FontSize',14)
+ylabel('Glucose','FontSize',14)
+title('Glucose','FontSize',14)
 
 
 % figure
@@ -149,7 +159,7 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
     k1=1; % this is for intracellulr lactate
     k2=1; % this is for intracellulr lactate
     k5=0.005*InitialPop; % lactate degradation 
-    k51=0.005*InitialPop;
+    k51=0.005;
     k52=0.5*0.005*InitialPop;
 
     BiasLactateTransport=1; % initially assume there is no bias in lactate transportation
@@ -158,11 +168,11 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
     omega12=InitialPop; 
     omega21=BiasLactateTransport*InitialPop;
     
-    KMAX1 = 1; % parameter for lactate dynamics, dependence on MCT1
-    KMAX4 = 1; % parameter for lactate dynamics, dependence on MCT4
+    KMAX1 = 0.1; % parameter for lactate dynamics, dependence on MCT1
+    KMAX4 = 0.1; % parameter for lactate dynamics, dependence on MCT4
    
-    VM4 = 0.1;
-    VM1 = 0.1;
+    VM4 = 1;
+    VM1 = 1;
     
     S1=1*InitialPop; % source of oxygen depends on how much population I have initially 
     S2 = 0; % when anitangiogenesis treatment is applied, no oxygen source to the second component
@@ -185,7 +195,7 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
 % extracellular lactate 2      
 
     deriv(2) = yp(2)-(-omega21*y(2) + omega12 * y(1) + k1*y(4)* MCT42*y(8)*VM4 / (KMAX4 + y(8)) - ...
-        VM1*y(4) * y (2) * MCT12 / (KMAX1 + y(2)) - k51 * y(2));
+        VM1*y(4) * y (2) * MCT12 / (KMAX1 + y(2)) - k5 * y(2));
  
 % population 1
 
@@ -206,27 +216,27 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
 % intracellular lactate 
 
     % parameters for ODIL
-    S01 = 10;
-    S02 = 10;
+    S01 = 50;
+    S02 = 50;
 
-    c0=1;
+    c0=0.05;
     
     % Glucose dependent source of intracellular lactate (GDIL)
     
-    Sl1=S01*((y(9)/c0)); 
+    Sl1 = (S01*y(9))/(1+y(5)/c0); 
 
-    Sl2=S02*((y(10)/c0));
+    Sl2 = (S02*y(10))/(1+y(6)/c0) ;
     
 
-    deriv(7) = yp(7) - (Sl1 - VM4 * MCT41 * y(3)*y(7)/(KMAX4 + y(7)) + VM1*MCT11 * y(3)*y(1)/(KMAX1 +y(1)) - k5 * y(7)); % 1st component
+    deriv(7) = yp(7) - (Sl1 - VM4 * MCT41 * y(3)*y(7)/(KMAX4 + y(7)) + VM1*MCT11 * y(3)*y(1)/(KMAX1 +y(1)) - k51 *y(7)*y(3)); % 1st compartment
     
-    deriv(8) = yp(8) - (Sl2 - VM4 * MCT42 * y(4)*y(8)/(KMAX4 + y(8)) + VM1*MCT12 * y(4)*y(2)/(KMAX1 +y(2)) - k5 * y(8)); % 2nd component
+    deriv(8) = yp(8) - (Sl2 - VM4 * MCT42 * y(4)*y(8)/(KMAX4 + y(8)) + VM1*MCT12 * y(4)*y(2)/(KMAX1 +y(2)) - k51 * y(8)*y(4)); % 2nd compartment
 
     % Glucose
-    Sg1 = 500;
-    Sg2 = 500;
-    GL1 = 500;
-    GL2 = 500;
+    Sg1 = 1000;
+    Sg2 = 0;
+    GL1 = 0;
+    GL2 = 1000;
     k4 = 1;
     
     deriv(9) = yp(9) - ( Sg1 - GL1 * y(9) + GL2 * y(10) - k4 * y(9) * y(3));
@@ -288,6 +298,6 @@ function value = death(lactate,oxygen)
 
     value=nu0*lactate/(L0*oxygen+lactate);
     
-    value = 7e-4;
+    value = 1e-3;
 end
 %%%
