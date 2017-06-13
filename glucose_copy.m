@@ -36,7 +36,7 @@ options=odeset('RelTol',1e-6);
 % 1 corresponds to fixed components, 0 to variable, they are determined
 % using this function
 
-T = 2e3;           % Sets the end of time interval
+T = 2e5;           % Sets the end of time interval
 tspan = [0 T];
 y0 = IC;           % Sets initial condition
 options=odeset('RelTol',1e-4);
@@ -262,7 +262,7 @@ function value = death(lactate,oxygen)
     nu0 = 5e-4;
     L0 = 0.2; 
 
-    value=nu0*lactate/(L0*oxygen+lactate) + 5e-4;
+    value=nu0*lactate/(L0*oxygen+lactate) + 10e-4;
     
  %   value = 1e-3;
 end
