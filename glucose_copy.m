@@ -36,7 +36,7 @@ options=odeset('RelTol',1e-6);
 % 1 corresponds to fixed components, 0 to variable, they are determined
 % using this function
 
-T = 2e5;           % Sets the end of time interval
+T = 1e5;           % Sets the end of time interval
 tspan = [0 T];
 y0 = IC;           % Sets initial condition
 options=odeset('RelTol',1e-4);
@@ -116,7 +116,7 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
     k4 = 1; % glucose consumption per cell
 
         
-    S1 = 2; %0.005*InitialPop; % source of oxygen depends on how much population I have initially 
+    S1 = 1; %0.005*InitialPop; % source of oxygen depends on how much population I have initially 
     S2 = 0; % when anitangiogenesis treatment is applied, no oxygen source to the second component
 
    
@@ -148,20 +148,20 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
     
     % Glucose parameters
     
-    Sg1 = 1;
+    Sg1 = 0.5;
     Sg2 = 0;
-    GL1 = 0.1; % glucose diffusion from the first to the second compartment
+    GL1 = 0.5; % glucose diffusion from the first to the second compartment
     GL2 = 0; % glucose diffusion from the second to the first compartment
    
     KG = 1;
-    gamL = 1;
+    gamL = 0.8;
     
     
-    gamG = 1;
+    gamG = 0.8;
     BL = 4.63e-4;
     BG = 2.78e-3;
     BO = 2.32e-4; 
-    k41 = 0.01; % lactate production as a ruslt of glycolysis
+    k41 = 0.2; % lactate production as a result of glycolysis
     
     % the rate of lactate consumption 
     
@@ -250,7 +250,7 @@ function value = birth3 (oxygen,lactate)
     a0 = 8.25e3*2;
     oxycr = 0.5*0.02^2; % since I need half less oxygen molecules for a reaction
 
-    value = a0 * ((oxygen^1.5*lactate/oxycr)-1)^exponent; % maybe changed oxygen power to 1.5 to ensure that lactate is much more beneficial if there is a lot of oxygen
+    value = a0 * ((oxygen*lactate/oxycr)-1)^exponent; % maybe changed oxygen power to 1.5 to ensure that lactate is much more beneficial if there is a lot of oxygen
     value = 1/value;
 end
 %%%
