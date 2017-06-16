@@ -7,7 +7,7 @@ clear all
 
 
 % note that I have to put here values of MCT which are inside the function
-     alpha = 0.2;
+     alpha = .5;
      MCT42 = 1;
      MCT11 = MCT42;
      MCT12 = MCT42*alpha;
@@ -15,8 +15,8 @@ clear all
 
 
 
-IC(1) = 0;          % lactate, 1st
-IC(2) = 0;          % lactate, 2nd
+IC(1) = 0;        % lactate, 1st
+IC(2) = 0;        % lactate, 2nd
 IC(3) = 1000;     % Initial population 1st compartment
 IC(4) = 1000;     % Initial population 2nd compartment
 IC(5) = 0.7;      % Initial oxygen 1st compartment    
@@ -25,7 +25,7 @@ IC(6) = 0.3;      % Initial oxygen 2nd compartment
 %IC(6) = 0.1;     % Initial MCT4 2nd compartment
 
 IC(7) = 0.1;      % Glucose, 1st
-IC(8) = 0.1;     % Glucose, 2nd
+IC(8) = 0.1;      % Glucose, 2nd
 
 InitialPop = IC(3) ; % have variable for initial population in the first compartment
 
@@ -36,7 +36,7 @@ options=odeset('RelTol',1e-6);
 % 1 corresponds to fixed components, 0 to variable, they are determined
 % using this function
 
-T = 1e5;           % Sets the end of time interval
+T = 2e6;           % Sets the end of time interval
 tspan = [0 T];
 y0 = IC;           % Sets initial condition
 options=odeset('RelTol',1e-4);
@@ -141,7 +141,7 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
 %     Sl2 = (S02*y(8))/(1+y(6)/c0) ;
     
     
-    KO = 2e-4;
+    KO = 2e-2;%2e-4;
     gG = 1;
     gL = 1;
     gO = 1;
@@ -154,13 +154,13 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
     GL2 = 0; % glucose diffusion from the second to the first compartment
    
     KG = 1;
-    gamL = 0.8;
+    gamL = 0.8;%2;%
     
     
-    gamG = 0.8;
-    BL = 4.63e-4;
-    BG = 2.78e-3;
-    BO = 2.32e-4; 
+    gamG = 0.8;%2;%
+    BL = 4.63e-4;%8e-4;%
+    BG = 2.78e-3;%5e-3;%
+    BO = 2.32e-4;%5e-4;% 
     k41 = 0.2; % lactate production as a result of glycolysis
     
     % the rate of lactate consumption 
@@ -222,7 +222,7 @@ function value = birth1 (oxygen,glucose)
     a0 = 8.25e3;
     oxycr = 0.02^2;
 
-    value = a0 * ((oxygen*glucose/oxycr)-1)^exponent;
+    value = a0 * ((oxygen * glucose/oxycr)-1)^exponent;
     value = 1/value;
 end
 %%%
@@ -233,8 +233,8 @@ function value = birth2 (glucose)
     % parameter values from de la Cruz et al. JTB (2016)
     
     exponent = -0.2;
-    a0 = 8.25e3*15;
-    oxycr = 0.02;
+    a0 = 8.25e3 * 15;
+    oxycr =  0.02;
 
     value = a0 * ((glucose/oxycr)-1)^exponent;
     value = 1/value;
@@ -247,11 +247,12 @@ function value = birth3 (oxygen,lactate)
     % parameter values from de la Cruz et al. JTB (2016)
     
     exponent = -0.2;
-    a0 = 8.25e3*2;
-    oxycr = 0.5*0.02^2; % since I need half less oxygen molecules for a reaction
+    a0 = 8.25e3 * 2;
+    oxycr =  0.02^3; % since I need half less oxygen molecules for a reaction
 
-    value = a0 * ((oxygen*lactate/oxycr)-1)^exponent; % maybe changed oxygen power to 1.5 to ensure that lactate is much more beneficial if there is a lot of oxygen
+    value = a0 * ((oxygen*lactate^0.2/oxycr)-1)^exponent; % maybe changed oxygen power to 1.5 to ensure that lactate is much more beneficial if there is a lot of oxygen
     value = 1/value;
+    %value =0;
 end
 %%%
 
@@ -259,10 +260,10 @@ end
 % death of cells depending on lactate and oxygen 
 function value = death(lactate,oxygen)
 
-    nu0 = 5e-4;
+    nu0 = 0.5e-3;
     L0 = 0.2; 
 
-    value=nu0*lactate/(L0*oxygen+lactate) + 10e-4;
+    value = nu0*lactate/(L0*oxygen+lactate) + 1e-3;
     
  %   value = 1e-3;
 end
