@@ -1,17 +1,17 @@
 clear all
 % Implicit ODE solver
-% Including intracellular lactate to reflect the effect of MCT correctly
+% Simple intracellular lactate dynamics
 % fixed MCT4 and MCT1 and they are turned on only when S2 = 0 
 % with glucose dynamics, simplified version
 
 
 
 % note that I have to put here values of MCT which are inside the function
-     alpha = 1;
-     MCT42 = .5;
-     MCT11 = MCT42;
-     MCT12 = MCT42*alpha;
-     MCT41 = MCT42*alpha;
+ alpha = 1;
+ MCT42 = .5;
+ MCT11 = MCT42;
+ MCT12 = MCT42*alpha;
+ MCT41 = MCT42*alpha;
 
 
 
@@ -21,8 +21,7 @@ IC(3) = 1000;     % Initial population 1st compartment
 IC(4) = 1000;     % Initial population 2nd compartment
 IC(5) = 0.7;      % Initial oxygen 1st compartment    
 IC(6) = 0.3;      % Initial oxygen 2nd compartment  
-%IC(5) = 0.1;     % Initial MCT4 1st comparmtent
-%IC(6) = 0.1;     % Initial MCT4 2nd compartment
+
 
 IC(7) = 0.1;      % Glucose, 1st
 IC(8) = 0.1;      % Glucose, 2nd

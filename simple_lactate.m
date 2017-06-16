@@ -1,7 +1,6 @@
 %clear all
 % Implicit ODE solver
-% fixed MCT4 
-% only one variable for lactate deescribed in a very simple way
+% only one variable for lactate described in a very simple way
 
 
 
@@ -13,13 +12,9 @@ IC(3) = 1000;     % Initial population 1st compartment
 IC(4) = 1000;        % Initial population 2nd compartment
 IC(5) = 0.7;      % Initial oxygen 1st compartment    
 IC(6) = 0.3;      % Initial oxygen 2nd compartment  
-%IC(5) = 0.1;      % Initial MCT4 1st comparmtent
-%IC(6) = 0.1;      % Initial MCT4 2nd compartment
-%IC(9)=0;
-%IC(10)=0;
+
 
 InitialPop = IC(3) ; % have variable for initial population in the first compartment
-
 
 
 t0 = 0;
@@ -54,8 +49,8 @@ alpha = 0.35;
 beta = 0.035;
 m = 2.7;
 K = 0.25;
-OER_norm = 1;%(m*K + y(len,5))/(K + y(len,5)); % oxygen enhancement ratio
-OER_hyp = 3;%(m*K + y(len,6))/(K + y(len,6));
+OER_norm = 1;%(m*K + y(len,5))/(K + y(len,5)); % oxygen enhancement ratio in normoxic region
+OER_hyp = 3;%(m*K + y(len,6))/(K + y(len,6)); % oxygen enhancement ratio in hypoxic region
 
 
 %%%%%%
@@ -69,7 +64,7 @@ final_total_after_radiation = final_normoxic_after_radiation + final_hypoxic_aft
 
 figure
 x = [final_normoxic final_normoxic_after_radiation; final_hypoxic final_hypoxic_after_radiation; final_total final_total_after_radiation];
-%store = x;
+%store = x; % this is for plotting under different treatment strategies
 xtl = {'Final normoxic' 'Final hypoxic' 'Final total'};
 hb = bar(x);
 set(gca, 'XtickLabel', xtl,'fontweight','bold','Fontsize',16)
@@ -90,29 +85,16 @@ xbar = [final_normoxic final_normoxic_after_radiation store(1,1) store(1,2);...
 hbar = bar(xbar);
 xtl = {'Final normoxic' 'Final hypoxic' 'Final total'};
 set(gca, 'XtickLabel', xtl,'fontweight','bold','Fontsize',16)
- set(hbar(1),'FaceColor','b')
- set(hbar(2),'FaceColor','k')
- set(hbar(3),'FaceColor','y')
- set(hbar(4),'FaceColor',[0,0,0]+alpha)
+set(hbar(1),'FaceColor','b')
+set(hbar(2),'FaceColor','k')
+set(hbar(3),'FaceColor','y')
+set(hbar(4),'FaceColor',[0,0,0]+alpha)
  
- ylabel('Population size','fontweight','bold','FontSize',16)
+ylabel('Population size','fontweight','bold','FontSize',16)
 h_legend = legend('Antiangiogenesis, before radiation','Antiangiogenesis, after radiation',...
     'Antiangiogenesis + MCT4 downregulation, before radiation','Antiangiogenesis + MCT4 downregulation, after radiation');
 set(h_legend,'FontSize',16);
- set(gca,'linewidth',2)
-
-% figure 
-% plot(mct,log(final_normoxic),mct,log(final_hypoxic),mct,log(final_total),'LineWidth', 2)
-% h_legend = legend('1st component','2nd component','Total')
-% set(h_legend,'FontSize',14)
-% xlabel('MCT','FontSize',14)
-% ylabel('log(Population)','FontSize',14)
-% title(['MCT influence on population sizes, final total ' num2str(final_total(i)) ', final normoxic ' num2str(final_normoxic(i)) ', final hypoxic ' num2str(final_hypoxic(i)) ' '],'FontSize',14)
-% set(gca,'XTick',[1 2 3 4 5 6] ); %This are going to be the only values affected.
-% set(gca,'XTickLabel',[10^-5 10^-4 10^-3 10^-2 10^-1 1] ); %This is what it's going to appear in those places.
-% grid on
-% 
-
+set(gca,'linewidth',2)
 
 
 
@@ -158,26 +140,14 @@ ylabel('Oxygen','fontweight','bold','FontSize',14)
 title('Oxygen','FontSize',14)
 set(gca,'linewidth',2)
 
-% % comparison of MCT4
-% subplot(2,2,4);
-% plot(t,y(:,5),'LineWidth', 2);
-% hold on
-% plot(t,y(:,6),'LineWidth', 2);
-% legend('1st component','2nd component')
-% xlabel('time')
-% ylabel('MCT4')
-% title(['MCT4 with fixed oxygen c_1 = ' num2str(oxygen1) ' and c_2 = ' num2str(oxygen2) ' '])
 
 function deriv = dynamics(t,y,yp,InitialPop)
 
 
     deriv=zeros(6,1); % create an empty column vector
 
-    k1=1; % this is for intracellulr lactate
-    k2=1; % this is for intracellulr lactate
+
     k5=0.005*InitialPop; % lactate degradation 
-    k51=0.005*InitialPop;
-    k52=0.5*0.005*InitialPop;
 
     BiasLactateTransport=1; % initially assume there is no bias in lactate transportation
 
@@ -185,19 +155,10 @@ function deriv = dynamics(t,y,yp,InitialPop)
     omega12=100;%0;0.1*InitialPop; % transporters
     omega21=500;%BiasLactateTransport*InitialPop;
 
-%     omega12=0;
-%     omega21=0;
 
 
     S1=1*InitialPop; % source of oxygen depends on how much population I have initially 
     S2 = 0; % when anitangiogenesis treatment is applied, no oxygen source to the second component
-%     if t<50000
-%         S2=1*InitialPop;    % in the hypoxic compartment source is the same
-%         %up to a certain time
-%     else
-%         S2=0;
-%         S2=1*InitialPop;
-%     end
     
 
     k6 = 1; % how much oxygen is used by cells
@@ -208,8 +169,7 @@ function deriv = dynamics(t,y,yp,InitialPop)
     
     diff21 = 100;%BiasOxygenTransport*0.05*InitialPop;
    
-% lactate 1
-
+   % lactate 1
 
     % add source
     S01=10;
@@ -227,34 +187,26 @@ function deriv = dynamics(t,y,yp,InitialPop)
     deriv(1) = yp(1)-(Sl1 -omega12*y(1) + omega21 * y(2) - k5 * y(1)); % assume m1 = 1
     
 
-% lactate 2      
+  % lactate 2      
 
     deriv(2) = yp(2)-(Sl2 -omega21*y(2) + omega12 * y(1) - k5 * y(2));
  
-% population 1
+  % population 1
 
     deriv(3) = yp(3) - ((birth(y(5)) - death(y(1),y(5))) * y (3));
 
-% population 2
+  % population 2
 
     deriv(4) = yp(4) - ((birth(y(6)) - death(y(2),y(6))) * y (4));
     
- % oxygen 1
+  % oxygen 1
 
     deriv(5) = yp(5) - (S1 - diff12 * y(5) + diff21 * y(6) - k6 * y(3) * y(5));
      
- % oxygen 2
+  % oxygen 2
      
-     deriv(6) = yp(6) - (S2 - diff21 * y(6) + diff12 * y(5) - k6 * y(4) * y(6));
+    deriv(6) = yp(6) - (S2 - diff21 * y(6) + diff12 * y(5) - k6 * y(4) * y(6));
     
-% % MCT4 1
-% 
-%     deriv(5) = yp(5) - (k3 * h1 /(H0 + h1) - k4 * y (5));
-% 
-% % MCT4 2
-% 
-%     deriv(6) = yp(6) - (k3 * h2 /(H0 + h2) - k4 * y (6));
-
     
 end
 
@@ -272,6 +224,7 @@ function value = birth (oxygen)
     value = 1/value;
 end
 %%%
+
 
 % death of cells depending on lactate and oxygen 
 function value = death(lactate,oxygen)
