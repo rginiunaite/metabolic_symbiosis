@@ -75,11 +75,11 @@ plot(t,y(:,3) + y(:,4),'LineWidth', 2); % total population
 h_legend = legend('1st compartment','2nd compartment','Total');
 set(h_legend,'FontSize',14)
 %yaxis(0:2200)
-xlabel('Time','FontSize',14)
-ylabel('Population','FontSize',14)
+xlabel('Time','fontweight','bold','FontSize',14)
+ylabel('Population','fontweight','bold','FontSize',14)
 %title(['Populations, final total ' num2str(final_total) ', final 1st component ' num2str(final_normoxic) ', final 2nd component ' num2str(final_hypoxic) ' '],'FontSize',14)
 title({['Populations, final total ' num2str(final_total) ', final 1st component ' num2str(final_normoxic) ', final 2nd component ' num2str(final_hypoxic) ' '],[' MCT1_1 = ' num2str(MCT11) ', MCT1_2 = ' num2str(MCT12) ', MCT4_1 = ' num2str(MCT41), ' MCT4_2 = ' num2str(MCT42) ' ']},'FontSize',14)
-
+set(gca,'linewidth',2)
 
 % comparison of extracellular lactate
 subplot(2,3,4);
@@ -88,10 +88,10 @@ hold on
 plot(t,y(:,2),'LineWidth', 2);
 % h_legend = legend('1st component','2nd component');
 % set(h_legend,'FontSize',14)
-xlabel('Time','FontSize',14)
-ylabel('Lactate','FontSize',14)
+xlabel('Time','fontweight','bold','FontSize',14)
+ylabel('Lactate','fontweight','bold','FontSize',14)
 title('Extracellular lactate ','FontSize',14)
-
+set(gca,'linewidth',2)
 
 % comparison of intracellular lactate
 subplot(2,3,5);
@@ -100,10 +100,10 @@ hold on
 plot(t,y(:,8),'LineWidth', 2);
 % h_legend = legend('1st component','2nd component');
 % set(h_legend,'FontSize',14)
-xlabel('Time','FontSize',14)
-ylabel('Lactate','FontSize',14)
+xlabel('Time','fontweight','bold','FontSize',14)
+ylabel('Lactate','fontweight','bold','FontSize',14)
 title('Intracellular lactate ','FontSize',14)
-
+set(gca,'linewidth',2)
 
 % comparison of Oxygen
 subplot(2,3,6);
@@ -113,10 +113,10 @@ plot(t,y(:,6),'LineWidth', 2);%set(gca,'FontSize',14)
 %plot(t,y(:,5) + y(:,7)); % total population
 % h_legend = legend('1st component','2nd component');
 % set(h_legend,'FontSize',14)
-xlabel('Time','FontSize',14)
-ylabel('Oxygen','FontSize',14)
+xlabel('Time','fontweight','bold','FontSize',14)
+ylabel('Oxygen','fontweight','bold','FontSize',14)
 title('Oxygen','FontSize',14)
-
+set(gca,'linewidth',2)
 
 
 

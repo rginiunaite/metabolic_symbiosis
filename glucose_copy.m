@@ -61,11 +61,12 @@ plot(t,y(:,3) + y(:,4),'LineWidth', 2); % total population
 h_legend = legend('1st compartment','2nd compartment','Total');
 set(h_legend,'FontSize',14)
 %yaxis(0:2200)
-xlabel('Time','FontSize',14)
-ylabel('Population','FontSize',14)
+xlabel('Time','fontweight','bold','FontSize',14)
+ylabel('Population','fontweight','bold','FontSize',14)
 %title(['Populations, final total ' num2str(final_total) ', final 1st component ' num2str(final_normoxic) ', final 2nd component ' num2str(final_hypoxic) ' '],'FontSize',14)
 title({['Populations, final total ' num2str(real(final_total)) ', final 1st compartment ' num2str(real(final_normoxic)) ', final 2nd compartment ' num2str(real(final_hypoxic)) ' '], ...
     [' MCT1_1 = ' num2str(MCT11) ', MCT1_2 = ' num2str(MCT12) ', MCT4_1 = ' num2str(MCT41), ' MCT4_2 = ' num2str(MCT42) ' ']},'FontSize',14)
+set(gca,'linewidth',2)
 
 
 % comparison of extracellular lactate
@@ -75,10 +76,10 @@ hold on
 plot(t,y(:,2),'LineWidth', 2);
 % h_legend = legend('1st component','2nd component');
 % set(h_legend,'FontSize',14)
-xlabel('Time','FontSize',14)
-ylabel('Lactate','FontSize',14)
+xlabel('Time','fontweight','bold','FontSize',14)
+ylabel('Lactate','fontweight','bold','FontSize',14)
 title('Lactate ','FontSize',14)
-
+set(gca,'linewidth',2)
 
 % comparison of intracellular lactate
 subplot(2,3,5);
@@ -87,10 +88,10 @@ hold on
 plot(t,y(:,8),'LineWidth', 2);
 % h_legend = legend('1st component','2nd component');
 % set(h_legend,'FontSize',14)
-xlabel('Time','FontSize',14)
-ylabel('Glucose','FontSize',14)
+xlabel('Time','fontweight','bold','FontSize',14)
+ylabel('Glucose','fontweight','bold','FontSize',14)
 title('Glucose','FontSize',14)
-
+set(gca,'linewidth',2)
 
 % comparison of Oxygen
 subplot(2,3,6);
@@ -100,10 +101,10 @@ plot(t,y(:,6),'LineWidth', 2);%set(gca,'FontSize',14)
 %plot(t,y(:,5) + y(:,7)); % total population
 % h_legend = legend('1st component','2nd component');
 % set(h_legend,'FontSize',14)
-xlabel('Time','FontSize',14)
-ylabel('Oxygen','FontSize',14)
+xlabel('Time','fontweight','bold','FontSize',14)
+ylabel('Oxygen','fontweight','bold','FontSize',14)
 title('Oxygen','FontSize',14)
-
+set(gca,'linewidth',2)
 
 function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
 
@@ -250,7 +251,7 @@ function value = birth3 (oxygen,lactate)
     a0 = 8.25e3 * 2;
     oxycr =  0.02^3; % since I need half less oxygen molecules for a reaction
 
-    value = a0 * ((oxygen^2*lactate^2/oxycr)-1)^exponent; % maybe changed oxygen power to 1.5 to ensure that lactate is much more beneficial if there is a lot of oxygen
+    value = a0 * ((oxygen^3*lactate^3/oxycr)-1)^exponent; % maybe changed oxygen power to 1.5 to ensure that lactate is much more beneficial if there is a lot of oxygen
     value = 1/value;
     %value =0;
 end

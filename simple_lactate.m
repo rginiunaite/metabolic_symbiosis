@@ -72,11 +72,11 @@ x = [final_normoxic final_normoxic_after_radiation; final_hypoxic final_hypoxic_
 %store = x;
 xtl = {'Final normoxic' 'Final hypoxic' 'Final total'};
 hb = bar(x);
-set(gca, 'XtickLabel', xtl,'Fontsize',16)
+set(gca, 'XtickLabel', xtl,'fontweight','bold','Fontsize',16)
  set(hb(1),'FaceColor','b')
  set(hb(2),'FaceColor','k')
 
-ylabel('Population size','FontSize',16)
+ylabel('Population size','fontweight','bold','FontSize',16)
 h_legend = legend('Before radiation','After radiation');
 set(h_legend,'FontSize',16);
 
@@ -89,17 +89,17 @@ xbar = [final_normoxic final_normoxic_after_radiation store(1,1) store(1,2);...
     final_total final_total_after_radiation store(3,1) store(3,2)];
 hbar = bar(xbar);
 xtl = {'Final normoxic' 'Final hypoxic' 'Final total'};
-set(gca, 'XtickLabel', xtl,'Fontsize',16)
+set(gca, 'XtickLabel', xtl,'fontweight','bold','Fontsize',16)
  set(hbar(1),'FaceColor','b')
  set(hbar(2),'FaceColor','k')
  set(hbar(3),'FaceColor','y')
  set(hbar(4),'FaceColor',[0,0,0]+alpha)
  
- ylabel('Population size','FontSize',16)
+ ylabel('Population size','fontweight','bold','FontSize',16)
 h_legend = legend('Antiangiogenesis, before radiation','Antiangiogenesis, after radiation',...
     'Antiangiogenesis + MCT4 downregulation, before radiation','Antiangiogenesis + MCT4 downregulation, after radiation');
 set(h_legend,'FontSize',16);
- 
+ set(gca,'linewidth',2)
 
 % figure 
 % plot(mct,log(final_normoxic),mct,log(final_hypoxic),mct,log(final_total),'LineWidth', 2)
@@ -127,10 +127,10 @@ plot(t,y(:,4),'LineWidth', 2); % second population
 plot(t,y(:,3) + y(:,4),'LineWidth', 2); % total population
 h_legend = legend('1st compartment','2nd compartment','Total');
 set(h_legend,'FontSize',14);
-xlabel('Time','FontSize',14)
-ylabel('Population','FontSize',14)
+xlabel('Time','fontweight','bold','FontSize',14)
+ylabel('Population','fontweight','bold','FontSize',14)
 title(['Populations, final total ' num2str(final_total) ', final 1st component ' num2str(final_normoxic) ', final 2nd component ' num2str(final_hypoxic) ' '],'FontSize',14)
-
+set(gca,'linewidth',2)
 
 
 % comparison of lactates
@@ -140,10 +140,10 @@ hold on
 plot(t,y(:,2),'LineWidth', 2);
 % h_legend = legend('1st component','2nd component')
 % set(h_legend,'FontSize',14)
-xlabel('Time','FontSize',14)
-ylabel('Lactate','FontSize',14)
+xlabel('Time','fontweight','bold','FontSize',14)
+ylabel('Lactate','fontweight','bold','FontSize',14)
 title('Lactate ','FontSize',14)
-
+set(gca,'linewidth',2)
 
 % comparison of Oxygen
 subplot(3,1,3);
@@ -153,9 +153,10 @@ plot(t,y(:,6),'LineWidth', 2);%set(gca,'FontSize',14)
 %plot(t,y(:,5) + y(:,7)); % total population
 % h_legend = legend('1st component','2nd component');
 % set(h_legend,'FontSize',14)
-xlabel('Time','FontSize',14)
-ylabel('Oxygen','FontSize',14)
+xlabel('Time','fontweight','bold','FontSize',14)
+ylabel('Oxygen','fontweight','bold','FontSize',14)
 title('Oxygen','FontSize',14)
+set(gca,'linewidth',2)
 
 % % comparison of MCT4
 % subplot(2,2,4);
