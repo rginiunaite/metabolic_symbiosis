@@ -7,11 +7,26 @@ clear all
 
 
 % note that I have to put here values of MCT which are inside the function
+     alpha = 0.5;
+     MCT42 = 1;
+     MCT11 = MCT42;
+     MCT12 = MCT42*alpha;
+     MCT41 = MCT42*alpha;
 
-     MCT11 = 1;
-     MCT12 = 1;
-     MCT41 = 0.6;
-     MCT42 = 1.2;
+%      m = 2;
+%      beta = 0.5;
+%      %eps = beta*m; % when relative to the increase
+%      eps = 0;
+%      MCT42 = m+eps;
+%      MCT11 = m;
+%      MCT12 = m;
+%      MCT41 = m-eps;
+          
+% MCT11 = 1;
+% MCT12 = 1;
+% MCT41 = 0.6;
+% MCT42 = 1.2;
+
 
 
 
@@ -35,7 +50,7 @@ options=odeset('RelTol',1e-6);
 % 1 corresponds to fixed components, 0 to variable, they are determined
 % using this function
 
-T = 1e5;           % Sets the end of time interval
+T = 3e5;           % Sets the end of time interval
 tspan = [0 T];
 y0 = IC;           % Sets initial condition
 options=odeset('RelTol',1e-4);
@@ -57,7 +72,7 @@ plot(t,y(:,3),'LineWidth', 2); % first population
 hold on
 plot(t,y(:,4),'LineWidth', 2); % second population
 plot(t,y(:,3) + y(:,4),'LineWidth', 2); % total population
-h_legend = legend('1st component','2nd component','Total');
+h_legend = legend('1st compartment','2nd compartment','Total');
 set(h_legend,'FontSize',14)
 %yaxis(0:2200)
 xlabel('Time','FontSize',14)
@@ -92,9 +107,9 @@ title('Intracellular lactate ','FontSize',14)
 
 % comparison of Oxygen
 subplot(2,3,6);
-plot(t,y(:,5),'LineWidth', 2);set(gca,'FontSize',14)
+plot(t,y(:,5),'LineWidth', 2);%set(gca,'FontSize',14)
 hold on
-plot(t,y(:,6),'LineWidth', 2);set(gca,'FontSize',14)
+plot(t,y(:,6),'LineWidth', 2);%set(gca,'FontSize',14)
 %plot(t,y(:,5) + y(:,7)); % total population
 % h_legend = legend('1st component','2nd component');
 % set(h_legend,'FontSize',14)
@@ -178,26 +193,14 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
 %     end
     
 
-    beta1 = 2.5; %parameter for the hypoxia dependent on HIF-1alpha    
-    if t<75000
-        k3=0.001; % MCT4 dynamics, factor that shows the dependence of hypoxia
-        h1=exp(beta1*(1-y(5)));
-        h2=exp(beta1*(1-y(6)));
-    else  
-        k3=0.001;  
-        %k3=0;
-        h1=exp(beta1*(1-y(5)));
-        h2=exp(beta1*(1-y(6)));
-    end
-
     k6 = 1; % how much oxygen is used by cells
 
     BiasOxygenTransport=1;
 
-    diff12 = 100;%0.5*InitialPop; % diffusion depends on Initial Poulation in the 1st comp
-    
-    diff21 = 100;%0.5*BiasOxygenTransport*InitialPop;
-   
+    diff12 = 0.5*InitialPop; % diffusion depends on Initial Poulation in the 1st comp
+    diff12 = 100;
+    diff21 = 0.5*BiasOxygenTransport*InitialPop;
+    diff21 = 100;
 % extracellular lactate 1
 
     deriv(1) = yp(1)-(-omega12*y(1) + omega21 * y(2) + k1*y(3)* MCT41*y(7)*VM4 / (KMAX4 + y(7)) - ...
@@ -236,8 +239,8 @@ function deriv = dynamics(t,y,yp,InitialPop,MCT41,MCT42,MCT11,MCT12)
 % intracellular lactate 
 
     % parameters for ODIL
-    S01=10;
-    S02=10;
+    S01 = 10;
+    S02 = 10;
 
     c0=0.05;
     
@@ -277,7 +280,7 @@ end
 function value = death(lactate,oxygen)
 
     nu0 = 5e-4;
-    L0 = 0.2; % previously was 0.1, to reduce the detrimental impact of lactate, do not knwo how it changed to 0.2 in his, or 0.1 in mine, I just wrote it wrong
+    L0 = 0.001; % previously was 0.1, to reduce the detrimental impact of lactate, do not knwo how it changed to 0.2 in his, or 0.1 in mine, I just wrote it wrong
 
     value=nu0*lactate/(L0*oxygen+lactate);
 end

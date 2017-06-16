@@ -7,8 +7,8 @@ clear all
 
 
 % note that I have to put here values of MCT which are inside the function
-     alpha = .5;
-     MCT42 = 1;
+     alpha = 1;
+     MCT42 = .5;
      MCT11 = MCT42;
      MCT12 = MCT42*alpha;
      MCT41 = MCT42*alpha;
@@ -250,7 +250,7 @@ function value = birth3 (oxygen,lactate)
     a0 = 8.25e3 * 2;
     oxycr =  0.02^3; % since I need half less oxygen molecules for a reaction
 
-    value = a0 * ((oxygen*lactate^0.2/oxycr)-1)^exponent; % maybe changed oxygen power to 1.5 to ensure that lactate is much more beneficial if there is a lot of oxygen
+    value = a0 * ((oxygen^2*lactate^2/oxycr)-1)^exponent; % maybe changed oxygen power to 1.5 to ensure that lactate is much more beneficial if there is a lot of oxygen
     value = 1/value;
     %value =0;
 end
@@ -263,7 +263,7 @@ function value = death(lactate,oxygen)
     nu0 = 0.5e-3;
     L0 = 0.2; 
 
-    value = nu0*lactate/(L0*oxygen+lactate) + 1e-3;
+    value = nu0*lactate/(L0*oxygen^0.2+lactate) + 1e-3;
     
  %   value = 1e-3;
 end
